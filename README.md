@@ -2,6 +2,8 @@
 
 ## Environment Setup
 1. git clone https://github.com/JintongHe/AIE_Project_Team1.git
+2. git clone https://github.com/robfiras/ls-iq.git
+3. git clone https://github.com/robfiras/loco-mujoco.git
 2. In the terminal
 ```angular2html
 cd loco-mujoco
