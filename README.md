@@ -1,20 +1,40 @@
 # AIE_Project_Team1
 
 ## Environment Setup
-1. git clone https://github.com/JintongHe/AIE_Project_Team1.git
-2. git clone https://github.com/robfiras/ls-iq.git
-3. git clone https://github.com/robfiras/loco-mujoco.git
-2. In the terminal
+In the terminal
 ```angular2html
 cd loco-mujoco
 pip install -e .
 cd ..
+```
+
+If wanna do imitation learning
+
+```
+loco-mujoco-download      # For downloading the dataset
+git clone https://github.com/robfiras/ls-iq.git
 cd ls-iq
 pip install -e .
+cd ..
 ```
-The environment should be good now
+test the environment using
+```
+python loco-mujoco/examples/simple_mushroom_env/example_unitree_a1.py
+```
+Starting code is at ```/pipeline```
 
-Starting code is at ```./test```
+When choosing the environment in loco-mujoco, make sure it's ```HumanoidTorque.walk.perfect```
 
-I think a good environment for us is ```HumanoidTorque.walk```
-but feel free to try other environments
+## Citation
+```
+@inproceedings{alhafez2023b,
+title={LocoMuJoCo: A Comprehensive Imitation Learning Benchmark for Locomotion},
+author={Firas Al-Hafez and Guoping Zhao and Jan Peters and Davide Tateo},
+booktitle={6th Robot Learning Workshop, NeurIPS},
+year={2023}
+}
+```
+
+---
+## Credits 
+Both Unitree models were taken from the [MuJoCo menagerie](https://github.com/google-deepmind/mujoco_menagerie)
