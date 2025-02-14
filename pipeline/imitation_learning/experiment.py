@@ -42,9 +42,9 @@ def experiment(env_id: str = None,
     core = Core(agent, mdp)
 
     for epoch in range(n_epochs):
-
+        print(f"starting epoch {epoch}")
         # train
-        core.learn(n_steps=n_steps_per_epoch, n_steps_per_fit=n_steps_per_fit, quiet=True, render=False)
+        core.learn(n_steps=n_steps_per_epoch, n_steps_per_fit=n_steps_per_fit, quiet=False, render=False)
 
         # evaluate
         dataset = core.evaluate(n_episodes=n_eval_episodes)

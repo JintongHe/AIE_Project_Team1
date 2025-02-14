@@ -5,12 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c561c074-0481-41b4-8d9d-886111c36a06" name="Changes" comment="uploaded kickstart file">
-      <change afterPath="$PROJECT_DIR$/pipeline/imitation_learning/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pipeline/imitation_learning/confs.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pipeline/imitation_learning/experiment.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pipeline/imitation_learning/launcher.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pipeline/imitation_learning/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipeline/agent_epoch_49.msh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ls-iq/imitation_lib/utils/networks.py" beforeDir="false" afterPath="$PROJECT_DIR$/ls-iq/imitation_lib/utils/networks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/imitation_learning/experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/imitation_learning/launcher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -44,10 +43,11 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.launcher.executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/test/AIE_Project_Team1/pipeline/imitation_learning",
+    "last_opened_file_path": "C:/test/AIE_Project_Team1/pipeline",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -66,7 +66,30 @@
       <recent name="C:\test\AIE_Project_Team1" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
+    <configuration name="launcher" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AIE_Project_Team1" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline/imitation_learning" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/imitation_learning/launcher.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AIE_Project_Team1" />
       <option name="ENV_FILES" value="" />
@@ -93,6 +116,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.launcher" />
       </list>
     </recent_temporary>
   </component>
@@ -113,7 +137,8 @@
       <option name="presentableId" value="Default" />
       <updated>1739471872156</updated>
       <workItem from="1739471873506" duration="930000" />
-      <workItem from="1739479031554" duration="3548000" />
+      <workItem from="1739479031554" duration="4885000" />
+      <workItem from="1739500098741" duration="5495000" />
     </task>
     <task id="LOCAL-00001" summary="Change Dir hierarchy">
       <option name="closed" value="true" />
@@ -139,7 +164,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739479054034</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="uploaded kickstart file">
+      <option name="closed" value="true" />
+      <created>1739482733681</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1739482733681</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -151,6 +184,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="uploaded kickstart file" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/AIE_Project_Team1$main.coverage" NAME="main Coverage Results" MODIFIED="1739482585966" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline" />
+    <SUITE FILE_PATH="coverage/AIE_Project_Team1$main.coverage" NAME="main Coverage Results" MODIFIED="1739552299369" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline" />
+    <SUITE FILE_PATH="coverage/AIE_Project_Team1$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1739500794475" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/imitation_learning" />
   </component>
 </project>

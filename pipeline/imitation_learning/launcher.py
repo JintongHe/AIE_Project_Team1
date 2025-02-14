@@ -5,7 +5,7 @@ from experiment_launcher.utils import is_local
 if __name__ == '__main__':
     LOCAL = is_local()
     TEST = False
-    USE_CUDA = False
+    USE_CUDA = True
 
     N_SEEDS = 3
 
@@ -21,20 +21,21 @@ if __name__ == '__main__':
                         use_timestamp=True,
                         )
 
-    default_params = dict(n_epochs=400,
+    default_params = dict(n_epochs=200,
                           n_steps_per_epoch=100000,
                           n_epochs_save=25,
                           n_eval_episodes=10,
                           n_steps_per_fit=1000,
                           use_cuda=USE_CUDA)
 
-    env_ids = ["Atlas.walk", "Atlas.carry",
-               "Talos.walk", "Talos.carry",
-               "UnitreeH1.walk", "UnitreeH1.run", "UnitreeH1.carry",
-               "UnitreeG1.walk", "UnitreeG1.run",
-               "HumanoidTorque.walk", "HumanoidTorque.run",
-               "HumanoidMuscle.walk", "HumanoidMuscle.run",
-               "UnitreeA1.simple", "UnitreeA1.hard"]
+    # env_ids = ["Atlas.walk", "Atlas.carry",
+    #            "Talos.walk", "Talos.carry",
+    #            "UnitreeH1.walk", "UnitreeH1.run", "UnitreeH1.carry",
+    #            "UnitreeG1.walk", "UnitreeG1.run",
+    #            "HumanoidTorque.walk", "HumanoidTorque.run",
+    #            "HumanoidMuscle.walk", "HumanoidMuscle.run",
+    #            "UnitreeA1.simple", "UnitreeA1.hard"]
+    env_ids = ["HumanoidTorque.walk.perfect"]
 
     for env_id in env_ids:
         launcher.add_experiment(env_id__=env_id, **default_params)
