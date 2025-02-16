@@ -34,7 +34,7 @@ print("Action Space Shape:", mdp.info.action_space.shape)
 use_cuda = torch.cuda.is_available()
 sw = None  # TensorBoard logging can be added later
 # agent = get_agent(env_id, mdp, use_cuda, sw, conf_path="imitation_learning/confs.yaml")
-agent = Agent.load("agent_epoch_49.msh")
+agent = Agent.load("agent_epoch_181.msh")
 # core = Core(agent, mdp)
 # dataset = core.evaluate(n_episodes=1000, render=True)
 # Reset the environment
