@@ -1,16 +1,4 @@
 from mushroom_rl.core import Core, Agent
-# from loco_mujoco import LocoEnv
-#
-#
-# env = LocoEnv.make("HumanoidTorque.walk.perfect")
-#
-# agent = Agent.load("loco-mujoco/logs/loco_mujoco_evalution_2025-02-09_21-29-47/env_id___HumanoidTorque.walk.perfect/0/agent_epoch_49_J_959.235794.msh")
-#
-# core = Core(agent, env)
-#
-# core.evaluate(n_episodes=10, render=True)
-#
-# env.play_trajectory_from_velocity(n_steps_per_episode=500)
 import matplotlib.pyplot as plt
 import os
 import sys
@@ -20,8 +8,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import sys
 from imitation_learning.utils import get_agent
+import math
 
-#1)
+
+#Extract ankle features from state
 def get_right_ankle_substate(state):
     # Indices of right ankle related features in the observation space
     right_ankle_indices = [
@@ -29,11 +19,11 @@ def get_right_ankle_substate(state):
         29   # dq_ankle_angle_r
     ]
     
-    # Extract the substate with only the right ankle related features
     right_ankle_substate = state[right_ankle_indices]
     
     return right_ankle_substate
 
+#Extract ankle action from action
 def get_action_substate(action):
     # Index of the action related feature
     action_index = 7
@@ -43,23 +33,58 @@ def get_action_substate(action):
     
     return action_substate
 
-#2)
-class SimpleModel(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super(SimpleModel, self).__init__()
-        self.fc1 = nn.Linear(input_dim, 64)
-        self.fc2 = nn.Linear(64, 32)
-        self.fc3 = nn.Linear(32, output_dim)
+#Model for predicting right ankle action
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_len=5000):
+        super(PositionalEncoding, self).__init__()
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0).transpose(0, 1)
+        self.register_buffer('pe', pe)
 
     def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+        return x + self.pe[:x.size(0), :]
+
+class TransformerModel(nn.Module):
+    def __init__(self, input_dim, output_dim, nhead=4, num_layers=2, dim_feedforward=128):
+        super(TransformerModel, self).__init__()
+        self.model_type = 'Transformer'
+        self.src_mask = None
+        self.pos_encoder = PositionalEncoding(input_dim)
+        encoder_layers = nn.TransformerEncoderLayer(input_dim, nhead, dim_feedforward)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layers, num_layers)
+        self.encoder = nn.Linear(input_dim, input_dim)
+        self.decoder = nn.Linear(input_dim, output_dim)
+        self.init_weights()
+
+    def init_weights(self):
+        initrange = 0.1
+        self.encoder.weight.data.uniform_(-initrange, initrange)
+        self.decoder.weight.data.uniform_(-initrange, initrange)
+
+    def forward(self, src):
+        if self.src_mask is None or self.src_mask.size(0) != len(src):
+            device = src.device
+            mask = self._generate_square_subsequent_mask(len(src)).to(device)
+            self.src_mask = mask
+
+        src = self.encoder(src)
+        src = self.pos_encoder(src)
+        output = self.transformer_encoder(src, self.src_mask)
+        output = self.decoder(output)
+        return output[-1]
+
+    def _generate_square_subsequent_mask(self, sz):
+        mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
+        mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+        return mask
 
 
 
-# Initialize the humanoid environment without left ankle movement
+# Initialize the humanoid environment
 env_id = "HumanoidTorque.walk.perfect"
 mdp = LocoEnv.make(env_id, use_box_feet=True)
 
@@ -72,68 +97,56 @@ for obs in mdp.get_all_observation_keys():
 print("Action Space:", mdp.info.action_space)
 print("Action Space Shape:", mdp.info.action_space.shape)
 
-
-
 # Check if GPU is available
 use_cuda = torch.cuda.is_available()
 sw = None  # TensorBoard logging can be added later
 # agent = get_agent(env_id, mdp, use_cuda, sw, conf_path="imitation_learning/confs.yaml")
+
+# Load the expert agent
 agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_495_J_642.787921.msh")
 agent = Agent.load(agent_file_path)
 # core = Core(agent, mdp)
 # dataset = core.evaluate(n_episodes=1000, render=True)
+
+
 # Reset the environment
+
+#Initialize the model
 state = mdp.reset()
-input_dim = 2  # Number of features in the substate
+input_dim = 36  # Number of features in the substate
 output_dim = 1  # Number of actions
-model = SimpleModel(input_dim, output_dim)
+model = TransformerModel(input_dim, output_dim)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-batch_size = 50
+# Initialize the optimizer
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+batch_size = 500
 epoch_losses = []
-num_epochs = 5000
-# #1) Extract ankle features
-# state = mdp.reset()
-# right_ankle_substate = get_right_ankle_substate(state)
-# print("Right Ankle Substate:", right_ankle_substate)
+num_epochs = 1000
 
-# #2)create model that takes in state and outputs action
-
-# #3) fead ankle features into the model and get action
-# right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32)
-# action = model(right_ankle_substate_tensor)
-# print("Model Action:", action.item())
-
-# #4) calculate loss from difference in actions
-# expert_action_state = agent.draw_action(state)
-# expert_action = expert_action_state[10]
-# expert_action_tensor = torch.tensor(expert_action, dtype=torch.float32)
-# loss = F.mse_loss(action, expert_action_tensor)
-# print("Loss:", loss.item())
-# #4) Replace expert action with model action
-# expert_action_state[10] = action.item()
-# #5) Step the environment 
 
 # Run evaluation for 1000 episodes
 for epoch in range(num_epochs):
     state = mdp.reset()  # Reset the environment for each episode
-    right_ankle_substate = get_right_ankle_substate(state)
+    #right_ankle_substate = get_right_ankle_substate(state)
+    right_ankle_substate = state
     done = False
     step = 0
     batch_loss = 0.0
+    epoch_loss = 0.0
 
     while not done:
         # Get action from expert
         action = agent.draw_action(state)
         right_ankle_action = get_action_substate(action)
         #Get action from ankle model
-        right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32)
-        model_action = model(right_ankle_substate_tensor)
+        right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+        model_action = model(right_ankle_substate_tensor).squeeze()
 
         # Calculate loss
         right_ankle_action_tensor = torch.tensor(right_ankle_action, dtype=torch.float32)
         loss = F.mse_loss(model_action, right_ankle_action_tensor)
         batch_loss += loss.item()
+        epoch_loss += loss.item()
 
         #accumulate gradients
         loss.backward()
@@ -146,8 +159,8 @@ for epoch in range(num_epochs):
             batch_loss = 0.0
 
         #replace expert action with model action
-        right_ankle_action = model_action.item()
-        action[7] = right_ankle_action
+        #right_ankle_action = model_action.item()
+        #action[7] = right_ankle_action
 
         # Print state and action values
         # print(f"Episode {episode + 1}, Step {step + 1}")
@@ -162,10 +175,11 @@ for epoch in range(num_epochs):
 
         # Update state
         state = next_state
-        right_ankle_substate = get_right_ankle_substate(state)
+        right_ankle_substate = state
         step += 1
-    epoch_losses.append(batch_loss)
-    print(f"Episode {epoch + 1} completed with loss: {loss.item()}")
+    average_epoch_loss = epoch_loss/(step+1)
+    epoch_losses.append(average_epoch_loss)
+    print(f"Epoch {epoch + 1} completed with average loss: {average_epoch_loss}")
 
 # Plot the loss after each epoch
 plt.plot(range(1, num_epochs + 1), epoch_losses)
@@ -173,3 +187,8 @@ plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.title('Loss After Each Epoch')
 plt.show()
+
+# Save the model weights
+model_save_path = os.path.join(os.path.dirname(__file__), "right_ankle_model.pth")
+torch.save(model.state_dict(), model_save_path)
+print(f"Model weights saved to {model_save_path}")
