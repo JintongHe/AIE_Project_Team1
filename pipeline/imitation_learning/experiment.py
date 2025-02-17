@@ -13,9 +13,9 @@ from loco_mujoco import LocoEnv
 from utils import get_agent
 
 
-def experiment(env_id: str = None,
+def experiment(env_id: str = "HumanoidTorque.walk.perfect",
                n_epochs: int = 500,
-               n_steps_per_epoch: int = 10000,
+               n_steps_per_epoch: int = 50000,
                n_steps_per_fit: int = 1024,
                n_eval_episodes: int = 50,
                n_epochs_save: int = 500,
