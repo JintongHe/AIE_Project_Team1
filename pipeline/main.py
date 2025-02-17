@@ -151,8 +151,8 @@ def main():
             epoch_loss += loss.item()
 
             #replace expert action with model action
-            right_ankle_action = model_action.item()
-            action[7] = right_ankle_action
+            # right_ankle_action = model_action.item()
+            # action[7] = right_ankle_action
 
             # Take action in environment
             next_state, reward, done, _ = mdp.step(action)
