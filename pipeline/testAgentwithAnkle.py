@@ -6,7 +6,6 @@ from mushroom_rl.core import Core, Agent
 from main import TransformerModel, get_right_ankle_substate, get_action_substate  # Import necessary functions and classes
 
 
-print("hello")
 # Initialize the humanoid environment
 env_id = "HumanoidTorque.walk.perfect"
 mdp = LocoEnv.make(env_id, use_box_feet=True)
@@ -19,7 +18,7 @@ agent = Agent.load(agent_file_path)
 input_dim = 36  # Number of features in the substate
 output_dim = 1  # Number of actions
 model = TransformerModel(input_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "right_ankle_model.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "right_ankle_model1.pth")
 model.load_state_dict(torch.load(model_load_path))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
@@ -52,6 +51,3 @@ for episode in range(num_episodes):
         state = next_state
         step += 1
     print(f"Episode {episode + 1} completed")
-
-# Close the environment
-mdp.close()

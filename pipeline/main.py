@@ -14,14 +14,15 @@ import math
 #Extract ankle features from state
 def get_right_ankle_substate(state):
     # Indices of right ankle related features in the observation space
-    right_ankle_indices = [
-        10,  # q_ankle_angle_r
-        29   # dq_ankle_angle_r
-    ]
+    #right_ankle_indices = [
+    #    10,  # q_ankle_angle_r
+    #    29   # dq_ankle_angle_r
+    #]
     
-    right_ankle_substate = state[right_ankle_indices]
+    #right_ankle_substate = state[right_ankle_indices]
     
-    return right_ankle_substate
+    #return right_ankle_substate
+    return state
 
 #Extract ankle action from action
 def get_action_substate(action):
@@ -83,112 +84,120 @@ class TransformerModel(nn.Module):
         return mask
 
 
+def main():
+    # Initialize the humanoid environment
+    env_id = "HumanoidTorque.walk.perfect"
+    mdp = LocoEnv.make(env_id, use_box_feet=True)
 
-# Initialize the humanoid environment
-env_id = "HumanoidTorque.walk.perfect"
-mdp = LocoEnv.make(env_id, use_box_feet=True)
+    print("Observation Space:", mdp.info.observation_space.low)
+    print("Observation Space Shape:", mdp.info.observation_space.shape)
 
-print("Observation Space:", mdp.info.observation_space.low)
-print("Observation Space Shape:", mdp.info.observation_space.shape)
+    print("Observation Variables:")
+    for obs in mdp.get_all_observation_keys():
+        print(obs)
+    print("Action Space:", mdp.info.action_space)
+    print("Action Space Shape:", mdp.info.action_space.shape)
 
-print("Observation Variables:")
-for obs in mdp.get_all_observation_keys():
-    print(obs)
-print("Action Space:", mdp.info.action_space)
-print("Action Space Shape:", mdp.info.action_space.shape)
+    # Check if GPU is available
+    use_cuda = torch.cuda.is_available()
+    sw = None  # TensorBoard logging can be added later
+    # agent = get_agent(env_id, mdp, use_cuda, sw, conf_path="imitation_learning/confs.yaml")
 
-# Check if GPU is available
-use_cuda = torch.cuda.is_available()
-sw = None  # TensorBoard logging can be added later
-# agent = get_agent(env_id, mdp, use_cuda, sw, conf_path="imitation_learning/confs.yaml")
-
-# Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_495_J_642.787921.msh")
-agent = Agent.load(agent_file_path)
-# core = Core(agent, mdp)
-# dataset = core.evaluate(n_episodes=1000, render=True)
-
-
-# Reset the environment
-
-#Initialize the model
-state = mdp.reset()
-input_dim = 36  # Number of features in the substate
-output_dim = 1  # Number of actions
-model = TransformerModel(input_dim, output_dim)
-
-# Initialize the optimizer
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-batch_size = 500
-epoch_losses = []
-num_epochs = 1000
+    # Load the expert agent
+    agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_423_J_991.255877.msh")
+    agent = Agent.load(agent_file_path)
+    # core = Core(agent, mdp)
+    # dataset = core.evaluate(n_episodes=1000, render=True)
 
 
-# Run evaluation for 1000 episodes
-for epoch in range(num_epochs):
-    state = mdp.reset()  # Reset the environment for each episode
-    #right_ankle_substate = get_right_ankle_substate(state)
-    right_ankle_substate = state
-    done = False
-    step = 0
-    batch_loss = 0.0
-    epoch_loss = 0.0
+    # Reset the environment
 
-    while not done:
-        # Get action from expert
-        action = agent.draw_action(state)
-        right_ankle_action = get_action_substate(action)
-        #Get action from ankle model
-        right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
-        model_action = model(right_ankle_substate_tensor).squeeze()
+    #Initialize the model
+    state = mdp.reset()
+    input_dim = 36  # Number of features in the substate
+    output_dim = 1  # Number of actions
+    model = TransformerModel(input_dim, output_dim)
 
-        # Calculate loss
-        right_ankle_action_tensor = torch.tensor(right_ankle_action, dtype=torch.float32)
-        loss = F.mse_loss(model_action, right_ankle_action_tensor)
-        batch_loss += loss.item()
-        epoch_loss += loss.item()
+    # Initialize the optimizer
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+    batch_size = 1000
+    epoch_losses = []
+    num_epochs = 200
 
-        #accumulate gradients
-        loss.backward()
 
-        # Perform optimization step every batch_size steps
-        if (step + 1) % batch_size == 0:
-            optimizer.step()
-            optimizer.zero_grad()
-            #print(f"Batch {step // batch_size + 1} completed with average loss: {batch_loss / batch_size}")
-            batch_loss = 0.0
+    # Run evaluation for 1000 episodes
+    for epoch in range(num_epochs):
+        state = mdp.reset()  # Reset the environment for each episode
+        right_ankle_substate = get_right_ankle_substate(state)
+        done = False
+        step = 0
+        batch_loss = 0.0
+        epoch_loss = 0.0
+        total_reward = 0.0
 
-        #replace expert action with model action
-        #right_ankle_action = model_action.item()
-        #action[7] = right_ankle_action
+        while not done:
+            print(f"Epoch {epoch + 1}, Step {step + 1}")
+            # Get action from expert
+            action = agent.draw_action(state)
+            right_ankle_action = get_action_substate(action)
+            #Get action from ankle model
+            right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+            model_action = model(right_ankle_substate_tensor).squeeze()
 
-        # Print state and action values
-        # print(f"Episode {episode + 1}, Step {step + 1}")
-        # print(f"State: {state}")
-        # print(f"Action: {action}")
+            # Calculate loss imitating expert action
+            right_ankle_action_tensor = torch.tensor(right_ankle_action, dtype=torch.float32)
+            loss = F.mse_loss(model_action, right_ankle_action_tensor)
+            batch_loss += loss.item()
+            epoch_loss += loss.item()
 
-        # Take action in environment
-        next_state, reward, done, _ = mdp.step(action)
+            #replace expert action with model action
+            right_ankle_action = model_action.item()
+            action[7] = right_ankle_action
 
-        # 🔹 Render the environment at every step
-        #mdp.render()
+            # Take action in environment
+            next_state, reward, done, _ = mdp.step(action)
+            total_reward += reward
 
-        # Update state
-        state = next_state
-        right_ankle_substate = state
-        step += 1
-    average_epoch_loss = epoch_loss/(step+1)
-    epoch_losses.append(average_epoch_loss)
-    print(f"Epoch {epoch + 1} completed with average loss: {average_epoch_loss}")
 
-# Plot the loss after each epoch
-plt.plot(range(1, num_epochs + 1), epoch_losses)
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title('Loss After Each Epoch')
-plt.show()
+            # Calculate loss as negative reward to maximize reward
+            # loss = -torch.tensor(reward, dtype=torch.float32, requires_grad=True)
+            # loss = torch.tensor(loss, dtype=torch.float32)
 
-# Save the model weights
-model_save_path = os.path.join(os.path.dirname(__file__), "right_ankle_model.pth")
-torch.save(model.state_dict(), model_save_path)
-print(f"Model weights saved to {model_save_path}")
+            #accumulate gradients
+            loss.backward()
+
+            # Perform optimization step every batch_size steps
+            if (step + 1) % batch_size == 0:
+                optimizer.step()
+                optimizer.zero_grad()
+                print(f"Batch {step // batch_size + 1} completed with average loss: {batch_loss / batch_size}")
+                batch_loss = 0.0
+
+            
+
+            
+            # 🔹 Render the environment at every step
+            #mdp.render()
+
+            # Update state
+            state = next_state
+            right_ankle_substate = get_right_ankle_substate(state)
+            step += 1
+        average_epoch_loss = epoch_loss/(step+1)
+        epoch_losses.append(average_epoch_loss)
+        print(f"Epoch {epoch + 1} completed with average loss: {average_epoch_loss}")
+
+    # Plot the loss after each epoch
+    plt.plot(range(1, num_epochs + 1), epoch_losses)
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Loss After Each Epoch')
+    plt.show()
+
+    # Save the model weights
+    model_save_path = os.path.join(os.path.dirname(__file__), "right_ankle_model.pth")
+    torch.save(model.state_dict(), model_save_path)
+    print(f"Model weights saved to {model_save_path}")
+
+if __name__ == '__main__':
+    main()
