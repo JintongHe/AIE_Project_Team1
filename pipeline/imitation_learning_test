@@ -13,7 +13,57 @@ import torch.nn.functional as F
 import sys
 from imitation_learning.utils import get_agent
 import math
+import numpy as np
 
+#Temporary reward function
+def ankle_training_reward(state, action, next_state):
+    """Composite reward function for ankle coordination training"""
+    # State indices based on provided observation variables
+    q_pelvis_tx, q_pelvis_tz, q_pelvis_ty = state[0], state[1], state[2]
+    q_pelvis_tilt, q_pelvis_list = state[3], state[4]
+    dq_pelvis_tx = state[18]  # Forward velocity
+    ankle_torque = action[7]  # TD3-generated ankle control
+
+    # -------------------------------------------------
+    # 1. Forward Motion Incentive (40% weight)
+    # -------------------------------------------------
+    target_velocity = 1.5  # m/s
+    velocity_ratio = dq_pelvis_tx / target_velocity
+    r_forward = 0.4 * np.clip(velocity_ratio, 0, 1)
+
+    # -------------------------------------------------
+    # 2. Stability Components (30% weight)
+    # -------------------------------------------------
+    # Torso orientation penalty
+    tilt_penalty = 0.15 * np.abs(q_pelvis_tilt)
+    list_penalty = 0.15 * np.abs(q_pelvis_list)
+    
+    # COM height maintenance
+    target_height = 0.9  # Adjust based on your agent's normal standing height
+    height_penalty = 0.1 * np.abs(q_pelvis_ty - target_height)
+    
+    r_stability = 0.3 - (tilt_penalty + list_penalty + height_penalty)
+
+    # -------------------------------------------------
+    # 3. Ankle-Specific Rewards (20% weight)
+    # -------------------------------------------------
+    # Torque efficiency penalty
+    torque_penalty = 0.05 * np.square(ankle_torque)
+    
+    # Foot contact stability (simplified)
+    contact_penalty = 0.15 if q_pelvis_tz < 0.05 else 0  # Approximate foot-ground contact
+    
+    r_ankle = 0.2 - (torque_penalty + contact_penalty)
+
+    # -------------------------------------------------
+    # 4. Survival Bonus (10% weight)
+    # -------------------------------------------------
+    survival_bonus = 0.1 if np.abs(q_pelvis_tilt) < 0.26 and np.abs(q_pelvis_list) < 0.26 else 0  # ~15 degrees
+
+    # -------------------------------------------------
+    # Total Reward Calculation
+    # -------------------------------------------------
+    return r_forward + r_stability + r_ankle + survival_bonus
 
 #Extract ankle features from state
 def get_right_ankle_substate(state):
@@ -129,11 +179,11 @@ def main():
 
     # Initialize the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)  # Decrease LR by a factor of 0.1 every 50 epochs
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.5)  # Decrease LR by a factor of 0.1 every 50 epochs
     batch_size = 1000
     epoch_losses = []
-    num_epochs = 200
-    patience = 10  # Number of epochs to wait for improvement
+    num_epochs = 1000
+    patience = 20  # Number of epochs to wait for improvement
     best_loss = float('inf')
     epochs_no_improve = 0
 
@@ -145,6 +195,15 @@ def main():
         batch_loss = 0.0
         epoch_loss = 0.0
         total_reward = 0.0
+        trajectory_steps = 0
+        total_trajectories = 0.0
+        total_tra_steps = 0.0
+
+        # Calculate the weighting factor for the reward loss
+        # if epoch < 100:
+        #     reward_weight = 1.0
+        # else:
+        #     reward_weight = min(1.0, (epoch-100) // 100 * 0.1)
 
         for _ in range(batch_size):
             #print(f"Epoch {epoch + 1}, Step {step + 1}")
@@ -157,20 +216,29 @@ def main():
 
             # Calculate loss imitating expert action
             right_ankle_action_tensor = torch.tensor(right_ankle_action, dtype=torch.float32).to(device)
-            loss = F.mse_loss(model_action, right_ankle_action_tensor)
-            batch_loss += loss.item()
-            epoch_loss += loss.item()
+            imitation_loss = F.mse_loss(model_action, right_ankle_action_tensor)
+            # batch_loss += loss.item()
+            # epoch_loss += loss.item()
+            # Replace expert action with model action
+            # action[7] = model_action.item()
 
-            #replace expert action with model action
-            # right_ankle_action = model_action.item()
-            # action[7] = right_ankle_action
 
             # Take action in environment
             next_state, reward, done, _ = mdp.step(action)
             total_reward += reward
+            # Calculate environment reward
+            env_reward = ankle_training_reward(state, action, next_state)
 
-            #accumulate gradients
-            loss.backward()
+            # Combine imitation loss and environment reward
+            # if trajectory_steps > 200:
+            #     combined_loss = imitation_loss * (1 - reward_weight) + torch.tensor(env_reward, dtype=torch.float32).to(device) * reward_weight
+
+            # else:
+            #     combined_loss = imitation_loss
+
+            # Accumulate gradients
+            #combined_loss.backward()
+            imitation_loss.backward()
 
 
             
@@ -181,6 +249,20 @@ def main():
             state = next_state
             right_ankle_substate = get_right_ankle_substate(state)
             step += 1
+
+            # Accumulate losses
+            batch_loss += imitation_loss.item()
+            epoch_loss += imitation_loss.item()
+
+
+
+        if epoch%50 == 0:
+            #print imitation reward, total reward, and environmental reward
+            print(f"Epoch {epoch + 1}, Step {step + 1}")
+            print(f"Imitation Loss: {imitation_loss.item()}")
+            # print(f"Environment Reward: {env_reward}")
+            # print(f"Combined Loss: {imitation_loss_loss.item()}")
+
 
         # Perform optimization step after each batch
         optimizer.step()
@@ -193,7 +275,6 @@ def main():
         average_epoch_loss = epoch_loss/(step+1)
         epoch_losses.append(average_epoch_loss)
         print(f"Epoch {epoch + 1} completed with average loss: {average_epoch_loss}")
-
         # Early stopping check
         if average_epoch_loss < best_loss:
             best_loss = average_epoch_loss
@@ -203,13 +284,36 @@ def main():
             if epochs_no_improve >= patience:
                 print(f"Early stopping at epoch {epoch + 1}")
                 break
+        
+        if epoch % 5 == 0:
+            state = mdp.reset()  # Reset the environment for each episode
+            right_ankle_substate = get_right_ankle_substate(state)
+            step = 0
+            done = False
+            while not done:
+                right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0).to(device)
+                model_action = model(right_ankle_substate_tensor).squeeze().item()
+                action[7] = model_action
+                next_state, reward, done, _ = mdp.step(action)
+                state = next_state
+                right_ankle_substate = get_right_ankle_substate(state)
+                step += 1
+            print(f"Rollout completed with total steps: {step}")
+            if step > 200:
+                model_save_path = os.path.join(os.path.dirname(__file__), "twohundred.pth")
+                torch.save(model.state_dict(), model_save_path)
+                print(f"Model weights saved to {model_save_path}")
+        if epoch % 100 == 0:
+                model_save_path = os.path.join(os.path.dirname(__file__), "checkpoint.pth")
+                torch.save(model.state_dict(), model_save_path)
+                print(f"Model weights saved to {model_save_path}")
 
     # Plot the loss after each epoch
-    plt.plot(range(1, num_epochs + 1), epoch_losses)
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Loss After Each Epoch')
-    plt.show()
+    # plt.plot(range(1, epoch_losses + 1), epoch_losses)
+    # plt.xlabel('Epoch')
+    # plt.ylabel('Loss')
+    # plt.title('Loss After Each Epoch')
+    # plt.show()
 
     # Save the model weights
     model_save_path = os.path.join(os.path.dirname(__file__), "right_ankle_model.pth")

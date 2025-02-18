@@ -18,7 +18,7 @@ agent = Agent.load(agent_file_path)
 input_dim = 36  # Number of features in the substate
 output_dim = 1  # Number of actions
 model = TransformerModel(input_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "right_ankle_model.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "bestIL.pth")
 model.load_state_dict(torch.load(model_load_path))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
@@ -50,4 +50,4 @@ for episode in range(num_episodes):
         # Update state
         state = next_state
         step += 1
-    print(f"Episode {episode + 1} completed")
+    print(f"Episode {episode + 1} completed with {step} steps")

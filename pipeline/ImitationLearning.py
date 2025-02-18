@@ -131,7 +131,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     batch_size = 1000
     epoch_losses = []
-    num_epochs = 200
+    num_epochs = 10
 
     # Run evaluation for 1000 episodes
     for epoch in range(num_epochs):
@@ -144,7 +144,7 @@ def main():
         total_reward = 0.0
 
         while not done:
-            print(f"Epoch {epoch + 1}, Step {step + 1}")
+            #print(f"Epoch {epoch + 1}, Step {step + 1}")
             # Get action from expert
             action = agent.draw_action(state)
             right_ankle_action = get_action_substate(action)
