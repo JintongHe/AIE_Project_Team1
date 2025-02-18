@@ -5,6 +5,9 @@ from loco_mujoco import LocoEnv
 from mushroom_rl.core import Core, Agent
 from ImitationLearning import TransformerModel, get_right_ankle_substate, get_action_substate  # Import necessary functions and classes
 
+# Check if CUDA is available, otherwise fallback to CPU
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
 # Initialize the humanoid environment
 env_id = "HumanoidTorque.walk.perfect"
@@ -17,9 +20,11 @@ agent = Agent.load(agent_file_path)
 # Load the model
 input_dim = 36  # Number of features in the substate
 output_dim = 1  # Number of actions
-model = TransformerModel(input_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "right_ankle_model.pth")
-model.load_state_dict(torch.load(model_load_path))
+model = TransformerModel(input_dim, output_dim).to(device)  # Move model to GPU/CPU
+model_load_path = os.path.join(os.path.dirname(__file__), "right_ankle_model1.pth")
+
+# Load model weights with map_location
+model.load_state_dict(torch.load(model_load_path, map_location=device))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
 
@@ -32,21 +37,21 @@ for episode in range(num_episodes):
     while not done:
         # Extract right ankle substate
         right_ankle_substate = state
-        right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
-        
+        right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0).to(device)
+
         # Get action from the model
         model_action = model(right_ankle_substate_tensor).squeeze().item()
-        
+
         # Replace the expert action with the model action
         action = agent.draw_action(state)
         action[7] = model_action
-        
+
         # Take action in the environment
         next_state, reward, done, _ = mdp.step(action)
-        
+
         # Render the environment
         mdp.render()
-        
+
         # Update state
         state = next_state
         step += 1
