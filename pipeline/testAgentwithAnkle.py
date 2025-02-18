@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 from loco_mujoco import LocoEnv
 from mushroom_rl.core import Core, Agent
-from main import TransformerModel, get_right_ankle_substate, get_action_substate  # Import necessary functions and classes
+from ImitationLearning import TransformerModel, get_right_ankle_substate, get_action_substate  # Import necessary functions and classes
 
 
 # Initialize the humanoid environment
@@ -11,14 +11,14 @@ env_id = "HumanoidTorque.walk.perfect"
 mdp = LocoEnv.make(env_id, use_box_feet=True)
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_495_J_642.787921.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_423_J_991.255877.msh")
 agent = Agent.load(agent_file_path)
 
 # Load the model
 input_dim = 36  # Number of features in the substate
 output_dim = 1  # Number of actions
 model = TransformerModel(input_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "right_ankle_model1.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "right_ankle_model.pth")
 model.load_state_dict(torch.load(model_load_path))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
