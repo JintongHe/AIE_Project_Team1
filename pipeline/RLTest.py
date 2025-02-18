@@ -104,10 +104,6 @@ class AnkleCritic(nn.Module):
         )
     
     def forward(self, state, action):
-        while action.dim() < state.dim():
-            action = action.unsqueeze(-1)
-        while action.dim() > state.dim():
-            action = action.squeeze(-1)
         return self.net(torch.cat([state, action], dim=1))
 
 # TD3 Agent for Ankle Training

@@ -1,9 +1,13 @@
 from mushroom_rl.core import Core, Agent
 import matplotlib.pyplot as plt
 import os
+import matplotlib.pyplot as plt
+import os
 import sys
 from loco_mujoco import LocoEnv
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
 import torch.nn as nn
 import torch.nn.functional as F
 import sys
@@ -84,11 +88,14 @@ class TransformerModel(nn.Module):
         return mask
 
 
+
 def main():
     # Initialize the humanoid environment
     env_id = "HumanoidTorque.walk.perfect"
     mdp = LocoEnv.make(env_id, use_box_feet=True)
 
+    print("Observation Space:", mdp.info.observation_space.low)
+    print("Observation Space Shape:", mdp.info.observation_space.shape)
     print("Observation Space:", mdp.info.observation_space.low)
     print("Observation Space Shape:", mdp.info.observation_space.shape)
 
@@ -97,33 +104,34 @@ def main():
         print(obs)
     print("Action Space:", mdp.info.action_space)
     print("Action Space Shape:", mdp.info.action_space.shape)
+    print("Observation Variables:")
+    for obs in mdp.get_all_observation_keys():
+        print(obs)
+    print("Action Space:", mdp.info.action_space)
+    print("Action Space Shape:", mdp.info.action_space.shape)
 
-    # Check if GPU is available
-    use_cuda = torch.cuda.is_available()
-    sw = None  # TensorBoard logging can be added later
-    # agent = get_agent(env_id, mdp, use_cuda, sw, conf_path="imitation_learning/confs.yaml")
 
     # Load the expert agent
     agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_423_J_991.255877.msh")
     agent = Agent.load(agent_file_path)
-    # core = Core(agent, mdp)
-    # dataset = core.evaluate(n_episodes=1000, render=True)
 
 
-    # Reset the environment
+    if torch.backends.mps.is_available():
+        device = torch.device("mps") 
+    else: 
+        device = torch.device("cpu")
 
     #Initialize the model
     state = mdp.reset()
     input_dim = 36  # Number of features in the substate
     output_dim = 1  # Number of actions
-    model = TransformerModel(input_dim, output_dim)
+    model = TransformerModel(input_dim, output_dim).to(device)
 
     # Initialize the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     batch_size = 1000
     epoch_losses = []
     num_epochs = 200
-
 
     # Run evaluation for 1000 episodes
     for epoch in range(num_epochs):
@@ -141,27 +149,22 @@ def main():
             action = agent.draw_action(state)
             right_ankle_action = get_action_substate(action)
             #Get action from ankle model
-            right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+            right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0).to(device)
             model_action = model(right_ankle_substate_tensor).squeeze()
 
             # Calculate loss imitating expert action
-            right_ankle_action_tensor = torch.tensor(right_ankle_action, dtype=torch.float32)
+            right_ankle_action_tensor = torch.tensor(right_ankle_action, dtype=torch.float32).to(device)
             loss = F.mse_loss(model_action, right_ankle_action_tensor)
             batch_loss += loss.item()
             epoch_loss += loss.item()
 
             #replace expert action with model action
-            right_ankle_action = model_action.item()
-            action[7] = right_ankle_action
+            # right_ankle_action = model_action.item()
+            # action[7] = right_ankle_action
 
             # Take action in environment
             next_state, reward, done, _ = mdp.step(action)
             total_reward += reward
-
-
-            # Calculate loss as negative reward to maximize reward
-            # loss = -torch.tensor(reward, dtype=torch.float32, requires_grad=True)
-            # loss = torch.tensor(loss, dtype=torch.float32)
 
             #accumulate gradients
             loss.backward()
@@ -172,8 +175,6 @@ def main():
                 optimizer.zero_grad()
                 print(f"Batch {step // batch_size + 1} completed with average loss: {batch_loss / batch_size}")
                 batch_loss = 0.0
-
-            
 
             
             # 🔹 Render the environment at every step
@@ -201,3 +202,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+            
