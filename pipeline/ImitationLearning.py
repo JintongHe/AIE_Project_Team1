@@ -91,7 +91,7 @@ class TransformerModel(nn.Module):
 
 def main():
     # Initialize the humanoid environment
-    env_id = "HumanoidTorque.walk.perfect"
+    env_id = "HumanoidTorque.walk.real"
     mdp = LocoEnv.make(env_id, use_box_feet=True)
 
     print("Observation Space:", mdp.info.observation_space.low)
@@ -112,7 +112,7 @@ def main():
 
 
     # Load the expert agent
-    agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_423_J_991.255877.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "best_real_agent_141.msh")
     agent = Agent.load(agent_file_path)
 
 

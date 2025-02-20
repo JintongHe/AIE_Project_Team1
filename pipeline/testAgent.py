@@ -4,7 +4,7 @@ from mushroom_rl.core import Core, Agent
 from loco_mujoco import LocoEnv
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_423_J_991.255877.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_450.msh")
 agent = Agent.load(agent_file_path)
 
 # Initialize the humanoid environment

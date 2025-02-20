@@ -11,14 +11,14 @@ env_id = "HumanoidTorque.walk.perfect"
 mdp = LocoEnv.make(env_id, use_box_feet=True)
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "agent_epoch_423_J_991.255877.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "best_real_agent_141.msh")
 agent = Agent.load(agent_file_path)
 
 # Load the model
 input_dim = 36  # Number of features in the substate
 output_dim = 1  # Number of actions
 model = TransformerModel(input_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "bestIL.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "real_141_best.pth")
 model.load_state_dict(torch.load(model_load_path))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
