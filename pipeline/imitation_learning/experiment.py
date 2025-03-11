@@ -13,12 +13,12 @@ from loco_mujoco import LocoEnv
 from utils import get_agent
 
 
-def experiment(env_id: str = "HumanoidTorque.walk.perfect",
-               n_epochs: int = 500,
+def experiment(env_id: str = "HumanoidTorque.walk.real",
+               n_epochs: int = 450,
                n_steps_per_epoch: int = 50000,
                n_steps_per_fit: int = 1024,
                n_eval_episodes: int = 50,
-               n_epochs_save: int = 500,
+               n_epochs_save: int = 450,
                gamma: float = 0.99,
                results_dir: str = './logs',
                use_cuda: bool = False,
@@ -56,6 +56,11 @@ def experiment(env_id: str = "HumanoidTorque.walk.perfect",
         sw.add_scalar("Eval_J-stochastic", J_mean, epoch)
         sw.add_scalar("Eval_L-stochastic", L, epoch)
         agent_saver.save(core.agent, R_mean)
+
+        # Save the agent every 100 epochs
+        if epoch >= 90 and epoch % 90 == 0:
+            agent_path = os.path.join(results_dir, f'agent_epoch_{epoch}.msh')
+            core.agent.save(agent_path, full_save=True)
 
     agent_saver.save_curr_best_agent()
     print("Finished.")
