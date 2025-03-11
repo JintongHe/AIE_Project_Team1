@@ -1,0 +1,153 @@
+from mushroom_rl.core import Agent
+import matplotlib.pyplot as plt
+import os
+import matplotlib.pyplot as plt
+import os
+from loco_mujoco import LocoEnv
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+
+
+def main():
+    # Initialize the humanoid environment
+    env_id = "HumanoidTorque.walk.real"
+    mdp = LocoEnv.make(env_id, use_box_feet=True)
+
+    print("Observation Space:", mdp.info.observation_space.low)
+    print("Observation Space Shape:", mdp.info.observation_space.shape)
+    print("Observation Space:", mdp.info.observation_space.low)
+    print("Observation Space Shape:", mdp.info.observation_space.shape)
+
+    print("Observation Variables:")
+    for obs in mdp.get_all_observation_keys():
+        print(obs)
+    print("Action Space:", mdp.info.action_space)
+    print("Action Space Shape:", mdp.info.action_space.shape)
+    print("Observation Variables:")
+    for obs in mdp.get_all_observation_keys():
+        print(obs)
+    print("Action Space:", mdp.info.action_space)
+    print("Action Space Shape:", mdp.info.action_space.shape)
+
+
+    # Load the expert agent
+    agent_file_path = os.path.join(os.path.dirname(__file__), "real_360.msh")
+    agent = Agent.load(agent_file_path)
+
+
+    if torch.backends.mps.is_available():
+        device = torch.device("mps") 
+    else: 
+        device = torch.device("cpu")
+
+    #Initialize the model
+    state = mdp.reset()
+    input_dim = 36  # Number of features in the substate
+    output_dim = 1  # Number of actions
+    model = TransformerModel(input_dim, output_dim).to(device)
+
+    # Initialize the optimizer
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.5)  # Decrease LR by a factor of 0.1 every 50 epochs
+    batch_size = 1000
+    epoch_losses = []
+    num_epochs = 500
+    patience = 20  # Number of epochs to wait for improvement
+    best_loss = float('inf')
+    epochs_no_improve = 0
+
+    # Run evaluation for 1000 episodes
+    for epoch in range(num_epochs):
+        state = mdp.reset()  # Reset the environment for each episode
+        right_ankle_substate = get_right_ankle_substate(state)
+        step = 0
+        batch_loss = 0.0
+        epoch_loss = 0.0
+        total_reward = 0.0
+
+        for _ in range(batch_size):
+            #print(f"Epoch {epoch + 1}, Step {step + 1}")
+            # Get action from expert
+            action = agent.draw_action(state)
+            right_ankle_action = get_action_substate(action)
+            #Get action from ankle model
+            right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0).to(device)
+            model_action = model(right_ankle_substate_tensor).squeeze()
+
+            # Calculate loss imitating expert action
+            right_ankle_action_tensor = torch.tensor(right_ankle_action, dtype=torch.float32).to(device)
+            imitation_loss = F.mse_loss(model_action, right_ankle_action_tensor)
+
+
+            # Take action in environment
+            next_state, reward, done, _ = mdp.step(action)
+            total_reward += reward
+
+            # Accumulate gradients
+            #combined_loss.backward()
+            imitation_loss.backward()
+
+
+            
+            # 🔹 Render the environment at every step
+            #mdp.render()
+
+            # Update state
+            state = next_state
+            right_ankle_substate = get_right_ankle_substate(state)
+            step += 1
+
+            # Accumulate losses
+            batch_loss += imitation_loss.item()
+            epoch_loss += imitation_loss.item()
+
+
+
+        if epoch%50 == 0:
+            #print imitation reward, total reward, and environmental reward
+            print(f"Epoch {epoch + 1}, Step {step + 1}")
+            print(f"Imitation Loss: {imitation_loss.item()}")
+
+
+        # Perform optimization step after each batch
+        optimizer.step()
+        optimizer.zero_grad()
+        scheduler.step()  # Update the learning rate
+
+
+        average_epoch_loss = epoch_loss/(step+1)
+        epoch_losses.append(average_epoch_loss)
+        print(f"Epoch {epoch + 1} completed with average loss: {average_epoch_loss}")
+        # Early stopping check
+        if average_epoch_loss < best_loss:
+            best_loss = average_epoch_loss
+            epochs_no_improve = 0            
+        else:
+            epochs_no_improve += 1
+            if epochs_no_improve >= patience:
+                print(f"Early stopping at epoch {epoch + 1}")
+                break
+
+        if epoch % 100 == 0:
+                model_save_path = os.path.join(os.path.dirname(__file__), "checkpoint.pth")
+                torch.save(model.state_dict(), model_save_path)
+                print(f"Model weights saved to {model_save_path}")
+
+    #Plot the loss after each epoch
+    plt.plot(range(1, len(epoch_losses) + 1), epoch_losses)    
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Loss After Each Epoch')
+    plt.show()
+
+    # Save the model weights
+    model_save_path = os.path.join(os.path.dirname(__file__), "agent_real_360.pth")
+    torch.save(model.state_dict(), model_save_path)
+    print(f"Model weights saved to {model_save_path}")
+
+if __name__ == '__main__':
+    main()
+            
