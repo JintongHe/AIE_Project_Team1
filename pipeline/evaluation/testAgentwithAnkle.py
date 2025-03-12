@@ -21,17 +21,11 @@ agent = Agent.load(agent_file_path)
 input_dim = 22  # Number of features in the substate
 hidden_dim = 64
 output_dim = 1  # Number of actions
-<<<<<<< HEAD:pipeline/testAgentwithAnkle.py
 model = TransformerModel(input_dim, output_dim).to(device)  # Move model to GPU/CPU
 model_load_path = os.path.join(os.path.dirname(__file__), "right_ankle_model1.pth")
 
 # Load model weights with map_location
 model.load_state_dict(torch.load(model_load_path, map_location=device))
-=======
-model = MLP(input_dim, hidden_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "MLP_best_IL.pth")
-model.load_state_dict(torch.load(model_load_path))
->>>>>>> manel:pipeline/evaluation/testAgentwithAnkle.py
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
 

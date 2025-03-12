@@ -32,12 +32,14 @@ def main():
 
     # Initialize the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    batch_size = 100
+    batch_size = 1000
+    update_frequency = 100
     epoch_losses = []
     num_epochs = 500
     patience = 1000  # Number of epochs to wait for improvement
     best_loss = float('inf')
     epochs_no_improve = 0
+    imitation_weight = 1.0
 
     for epoch in range(num_epochs):
         state = mdp.reset()  # Reset the environment for each episode
@@ -87,9 +89,13 @@ def main():
             epoch_imitation_loss += imitation_loss.item()
             epoch_reward += reward
 
-        # Perform optimization step after each batch
-        optimizer.step()
-        optimizer.zero_grad()  # Reset gradients after each batch
+            if step % update_frequency == 0:
+                # Update the model
+                optimizer.step()
+                optimizer.zero_grad()
+                batch_loss = 0.0
+
+        
 
         average_epoch_loss = epoch_loss / batch_size
         epoch_losses.append(average_epoch_loss)
@@ -104,6 +110,7 @@ def main():
             if epochs_no_improve >= patience:
                 print(f"Early stopping at epoch {epoch + 1}")
                 break
+        
         
 
 
