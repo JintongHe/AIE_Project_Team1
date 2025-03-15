@@ -3,7 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import copy
-import math
+from torch.distributions import Normal
+
 
 #Reward function
 def ankle_training_reward(state, action, next_state):
@@ -311,3 +312,132 @@ class MLP(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
+    
+
+class PPO:
+    def __init__(self, state_dim, action_dim, hidden_dim=64, lr=3e-4, gamma=0.99, epsilon=0.2, value_range=0.5):
+        self.actor = nn.Sequential(
+            nn.Linear(state_dim, hidden_dim),
+            nn.Tanh(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.Tanh(),
+            nn.Linear(hidden_dim, action_dim),
+        )
+        self.critic = nn.Sequential(
+            nn.Linear(state_dim, hidden_dim),
+            nn.Tanh(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.Tanh(),
+            nn.Linear(hidden_dim, 1)
+        )
+        self.optimizer = optim.Adam(list(self.actor.parameters()) + list(self.critic.parameters()), lr=lr)
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.value_range = value_range
+
+    def get_action(self, state):
+        state = torch.FloatTensor(state).unsqueeze(0)
+        mean = self.actor(state)
+        dist = Normal(mean, torch.full_like(mean, 0.1))
+        action = dist.sample()
+        return action.squeeze().detach().numpy(), dist.log_prob(action).squeeze().detach().numpy()
+
+    def update(self, states, actions, rewards, next_states, dones, old_log_probs):
+        states = torch.FloatTensor(states)
+        actions = torch.FloatTensor(actions)
+        rewards = torch.FloatTensor(rewards).unsqueeze(-1)
+        next_states = torch.FloatTensor(next_states)
+        dones = torch.FloatTensor(dones).unsqueeze(-1)
+        old_log_probs = torch.FloatTensor(old_log_probs).unsqueeze(-1)
+
+        # Compute advantage
+        with torch.no_grad():
+            values = self.critic(states)
+            next_values = self.critic(next_states)
+            advantages = rewards + self.gamma * next_values * (1 - dones) - values
+            returns = advantages + values
+
+        # PPO update
+        for _ in range(10):  # Run multiple epochs
+            mean = self.actor(states)
+            dist = Normal(mean, torch.full_like(mean, 0.1))
+            new_log_probs = dist.log_prob(actions).sum(dim=1, keepdim=True)
+            
+            ratio = torch.exp(new_log_probs - old_log_probs)
+            surr1 = ratio * advantages
+            surr2 = torch.clamp(ratio, 1 - self.epsilon, 1 + self.epsilon) * advantages
+            actor_loss = -torch.min(surr1, surr2).mean()
+
+            value_pred = self.critic(states)
+            value_loss = nn.MSELoss()(value_pred, returns)
+            value_loss = torch.clamp(value_loss, -self.value_range, self.value_range)
+
+            loss = actor_loss + 0.5 * value_loss
+
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
+
+        return loss.item()
+
+    def save(self, path):
+        torch.save({
+            'actor': self.actor.state_dict(),
+            'critic': self.critic.state_dict(),
+            'optimizer': self.optimizer.state_dict()
+        }, path)
+
+    def load(self, path):
+        checkpoint = torch.load(path)
+        self.actor.load_state_dict(checkpoint['actor'])
+        self.critic.load_state_dict(checkpoint['critic'])
+        self.optimizer.load_state_dict(checkpoint['optimizer'])
+
+
+##Evolutionary Strategy
+# Define Actor model
+class Actor(nn.Module):
+    def __init__(self, input_dim, output_dim, max_action):
+        super(Actor, self).__init__()
+        
+        self.l1 = nn.Linear(input_dim, 64)
+        self.l2 = nn.Linear(64, 64)
+        self.l3 = nn.Linear(64, output_dim)
+        
+        self.max_action = max_action
+        
+    def forward(self, state):
+        a = F.relu(self.l1(state))
+        a = F.relu(self.l2(a))
+        return self.max_action * torch.tanh(self.l3(a))
+
+class ESPolicy:
+    def __init__(self, input_dim, output_dim, max_action, device="cpu"):
+        self.actor = Actor(input_dim, output_dim, max_action).to(device)
+        self.max_action = max_action
+        self.device = device
+        
+    def get_params(self):
+        # Get all parameters as a single flattened vector
+        params = []
+        for param in self.actor.parameters():
+            params.append(param.data.view(-1))
+        return torch.cat(params)
+    
+    def set_params(self, flat_params):
+        # Set all parameters from a flattened vector
+        start = 0
+        for param in self.actor.parameters():
+            param_shape = param.data.shape
+            param_size = param.data.numel()
+            param.data.copy_(flat_params[start:start+param_size].view(param_shape))
+            start += param_size
+    
+    def select_action(self, state):
+        # Get action from the actor network
+        with torch.no_grad():
+            if not isinstance(state, torch.Tensor):
+                state = torch.FloatTensor(state).to(self.device)
+            if state.dim() == 1:
+                state = state.unsqueeze(0)  # Add batch dimension if missing
+            return self.actor(state).cpu().data.numpy().flatten()
