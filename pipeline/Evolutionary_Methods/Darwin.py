@@ -38,14 +38,14 @@ def main():
     agent = Agent.load(agent_file_path)
 
     # Initialize the ES policy
-    input_dim = 22  # Number of features in the substate
+    input_dim = 4   # Number of features in the substate
     output_dim = 1  # Number of actions for ankle
     max_action = 0.4
     policy = ESPolicy(input_dim, output_dim, max_action, device)
     
     # ES hyperparameters from Algorithm 1
     alpha = 0.01                # Learning rate α 
-    initial_sigma = 0.2        # Initial noise standard deviation σ
+    initial_sigma = 0.1        # Initial noise standard deviation σ
     min_sigma = 0.000002           # Minimum sigma (0.5% of max_action)
     sigma = initial_sigma       # Current sigma value
     n = 50                      # Population size n
@@ -60,7 +60,7 @@ def main():
     
     epoch_rewards = []
     sigma_values = []           # To track sigma changes
-    num_epochs = 500
+    num_epochs = 50
     episode_steps = 1000
     
     # Get initial policy parameters θ₀
@@ -120,11 +120,8 @@ def main():
             best_max_reward = max_reward
             best_theta = theta
             epochs_no_improve = 0
+            n = n + 10
             print(f"New best reward: {best_max_reward}")
-            # Save the model weights
-            model_save_path = os.path.join(os.path.dirname(__file__), "es_actor.pth")
-            torch.save(policy.actor.state_dict(), model_save_path)
-            print(f"Actor model weights saved to {model_save_path}")
         else:
             epochs_no_improve += 1
 
@@ -175,7 +172,7 @@ def main():
 
     # Save the model weights
     policy.set_params(best_theta)
-    model_save_path = os.path.join(os.path.dirname(__file__), "es_actor.pth")
+    model_save_path = os.path.join(os.path.dirname(__file__), "es_actor_best.pth")
     torch.save(policy.actor.state_dict(), model_save_path)
     print(f"Actor model weights saved to {model_save_path}")
 

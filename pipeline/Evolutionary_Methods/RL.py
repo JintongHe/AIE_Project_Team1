@@ -16,7 +16,7 @@ from ModelsAndUtils import Actor, ESPolicy, ankle_training_reward, get_right_ank
 
 def main():
     # Initialize the humanoid environment
-    env_id = "HumanoidTorque.walk.perfect"
+    env_id = "HumanoidTorque.walk.real"
     mdp = LocoEnv.make(env_id, use_box_feet=True, reward_type="custom", 
                        reward_params=dict(reward_callback=ankle_training_reward))
 
@@ -38,22 +38,22 @@ def main():
     agent = Agent.load(agent_file_path)
 
     # Initialize the ES policy
-    input_dim = 22  # Number of features in the substate
+    input_dim = 4  # Number of features in the substate
     output_dim = 1  # Number of actions for ankle
     max_action = 0.4
     policy = ESPolicy(input_dim, output_dim, max_action, device)
     
     # ES hyperparameters from Algorithm 1
-    alpha = 0.1                # Learning rate α 
+    alpha = 0.01               # Learning rate α 
     initial_sigma = 0.2        # Initial noise standard deviation σ
     min_sigma = 0.000002           # Minimum sigma (0.5% of max_action)
     sigma = initial_sigma       # Current sigma value
-    n = 32                      # Population size n
+    n = 50                      # Population size n
     
     # Parameters for adaptive sigma
     best_mean_reward = 0.0
-    sigma_decay_factor = 0.1   # How much to decrease sigma when reward improves
-    improvement_threshold = 80 # Minimum improvement to trigger sigma decrease
+    sigma_decay_factor = 0.75   # How much to decrease sigma when reward improves
+    improvement_threshold = 0.5 # Minimum improvement to trigger sigma decrease
     
     epoch_rewards = []
     sigma_values = []           # To track sigma changes
@@ -93,7 +93,7 @@ def main():
                 next_state, reward, done, _ = mdp.step(expert_action)
                 
                 if done:
-                    reward = step + 1
+                    reward = step//100
                 else:
                     reward = 0
                 episode_reward += reward
@@ -116,12 +116,17 @@ def main():
             weighted_sum += returns_tensor[i] * epsilons[i]
         
         # Update the policy parameters using ES update rule
+        update = alpha * (1 / (n * sigma)) * weighted_sum
+        # print("original theta", theta)
+        # print("update", alpha * (1 / (n * sigma)) * weighted_sum)
+        #print("ratio", update/theta)
         theta = theta + alpha * (1 / (n * sigma)) * weighted_sum
         policy.set_params(theta)
         
         # Record the mean return for this epoch
         mean_return = returns_tensor.mean().item()
         epoch_rewards.append(mean_return)
+        
         
         # Adaptive sigma: decrease sigma when rewards improve
         if mean_return > best_mean_reward + improvement_threshold:
@@ -131,7 +136,7 @@ def main():
             print(f"Epoch {t + 1}: Reward improved to {mean_return}. Decreasing sigma to {sigma:.6f}")
         
         sigma_values.append(sigma)
-        print(f"Epoch {t + 1} completed with mean return: {mean_return}, sigma: {sigma:.6f}")
+        print(f"Epoch {t + 1} completed with mean return: {mean_return}")
     
     # Plot the rewards after each epoch
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)

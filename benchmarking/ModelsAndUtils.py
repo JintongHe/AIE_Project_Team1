@@ -61,8 +61,26 @@ def ankle_training_reward(state, action, next_state):
 def get_right_ankle_substate(state):
     """Extract relevant features for ankle control"""
     relevant_indices = [
+        0,  # q_pelvis_tx
+        1,  # q_pelvis_tz
+        2,  # q_pelvis_ty
+        3,  # q_pelvis_tilt
+        4,  # q_pelvis_list
+        5,  #q_pelvis_rotation
+        6,  #q_hip_flexion_r
+        7,  #q_hip_adduction_r
+        8,  #q_hip_rotation_r
         9,  #q_knee_angle_r
         10,  #q_ankle_angle_r
+        19,  # dq_pelvis_tx
+        20,  # dq_pelvis_tz
+        21,  # dq_pelvis_ty
+        22,  # dq_pelvis_tilt
+        23,  # dq_pelvis_list
+        24,  #dq_pelvis_rotation
+        25,  #dq_hip_flexion_r
+        26,  #dq_hip_adduction_r
+        27,  #dq_hip_rotation_r
         28,  #dq_knee_angle_r
         29,  #dq_ankle_angle_r
     ]
@@ -374,53 +392,3 @@ class PPO:
         self.actor.load_state_dict(checkpoint['actor'])
         self.critic.load_state_dict(checkpoint['critic'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
-
-
-##Evolutionary Strategy
-# Define Actor model
-class Actor(nn.Module):
-    def __init__(self, input_dim, output_dim, max_action):
-        super(Actor, self).__init__()
-        
-        self.l1 = nn.Linear(input_dim, 16)
-        self.l2 = nn.Linear(16, 16)
-        self.l3 = nn.Linear(16, output_dim)
-        
-        self.max_action = max_action
-        
-    def forward(self, state):
-        a = torch.tanh(self.l1(state))
-        a = torch.tanh(self.l2(a))
-        return self.max_action * torch.tanh(self.l3(a))
-
-
-class ESPolicy:
-    def __init__(self, input_dim, output_dim, max_action, device="mps"):
-        self.actor = Actor(input_dim, output_dim, max_action).to(device)
-        self.max_action = max_action
-        self.device = device
-        
-    def get_params(self):
-        # Get all parameters as a single flattened vector
-        params = []
-        for param in self.actor.parameters():
-            params.append(param.data.view(-1))
-        return torch.cat(params)
-    
-    def set_params(self, flat_params):
-        # Set all parameters from a flattened vector
-        start = 0
-        for param in self.actor.parameters():
-            param_shape = param.data.shape
-            param_size = param.data.numel()
-            param.data.copy_(flat_params[start:start+param_size].view(param_shape))
-            start += param_size
-    
-    def select_action(self, state):
-        # Get action from the actor network
-        with torch.no_grad():
-            if not isinstance(state, torch.Tensor):
-                state = torch.FloatTensor(state).to(self.device)
-            if state.dim() == 1:
-                state = state.unsqueeze(0)  # Add batch dimension if missing
-            return self.actor(state).cpu().data.numpy().flatten()

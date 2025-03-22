@@ -400,9 +400,9 @@ class Actor(nn.Module):
     def __init__(self, input_dim, output_dim, max_action):
         super(Actor, self).__init__()
         
-        self.l1 = nn.Linear(input_dim, 64)
-        self.l2 = nn.Linear(64, 64)
-        self.l3 = nn.Linear(64, output_dim)
+        self.l1 = nn.Linear(input_dim, 16)
+        self.l2 = nn.Linear(16, 16)
+        self.l3 = nn.Linear(16, output_dim)
         
         self.max_action = max_action
         
@@ -412,7 +412,7 @@ class Actor(nn.Module):
         return self.max_action * torch.tanh(self.l3(a))
 
 class ESPolicy:
-    def __init__(self, input_dim, output_dim, max_action, device="cpu"):
+    def __init__(self, input_dim, output_dim, max_action, device="mps"):
         self.actor = Actor(input_dim, output_dim, max_action).to(device)
         self.max_action = max_action
         self.device = device

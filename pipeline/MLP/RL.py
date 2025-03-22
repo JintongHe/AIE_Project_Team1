@@ -60,6 +60,9 @@ def main():
             right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0).to(device)
             model_action = model(right_ankle_substate_tensor).squeeze()
 
+            #Replace the expert action with the model action
+            action[7] = model_action.item()
+
             # Take action in environment
             next_state, reward, done, _ = mdp.step(action)
             total_reward += reward
