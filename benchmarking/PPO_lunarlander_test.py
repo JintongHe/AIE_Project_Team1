@@ -105,9 +105,13 @@ def main():
     policy.load_state_dict(torch.load(policy_load_path))
     policy.eval()
 
-    device = torch.device("mps" if torch.backends.mps.is_available() else 
-                     "cuda" if torch.cuda.is_available() else 
-                     "cpu")  
+    # device = torch.device("mps" if torch.backends.mps.is_available() else 
+    #                  "cuda" if torch.cuda.is_available() else 
+    #                  "cpu")  
+    device = torch.device("cpu")
     # Test the trained policy
     print("\n--- Running test episodes with the best model ---")
     test_rewards = test_policy(policy, test_env, num_episodes=5, device=device)
+
+if __name__ == "__main__":
+    main()

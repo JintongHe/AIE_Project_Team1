@@ -85,6 +85,12 @@ def get_right_ankle_substate(state):
         28,  #dq_knee_angle_r
         29,  #dq_ankle_angle_r
     ]
+    # relevant_indices = [
+    #     9,
+    #     10,
+    #     28,
+    #     29
+    # ]
     right_ankle_substate = state[relevant_indices]
     return right_ankle_substate
 

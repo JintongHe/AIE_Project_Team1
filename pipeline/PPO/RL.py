@@ -217,7 +217,11 @@ def ppo_train(policy, value_function, env, agent, state_dim, action_dim, num_epo
         next_state, reward, done, _ = env.step(body_action)
         
         # Calculate reward as MSE between expert and policy actions
-        reward = -F.mse_loss(torch.tensor(expert_action).to(device), torch.tensor(action).to(device)) + 1
+        # reward = -F.mse_loss(torch.tensor(expert_action).to(device), torch.tensor(action).to(device)) + 1
+        if done:
+            reward = -100
+        else:
+            reward = 1
         
         # Store trajectory in buffer
         buffer.store(ankle_state, action, reward, value.item(), log_prob.item(), done)
@@ -396,7 +400,7 @@ def main():
     #     device = torch.device("mps") 
     # else: 
     #     device = torch.device("cpu")
-    device = 'cpu'
+    device = 'mps'
 
     # Initialize the humanoid environment
     env_id = "HumanoidTorque.walk.real"
@@ -432,7 +436,7 @@ def main():
         train_pi_iters=80,        # Policy optimization iterations
         train_v_iters=80,         # Value function iterations
         target_kl=0.1,           # Target KL divergence for early stopping
-        max_ep_len=2000,          # Maximum episode length for BipedalWalker
+        max_ep_len=800,          # Maximum episode length for BipedalWalker
         batch_size=64,            # Batch size for training
         device=device
     )
