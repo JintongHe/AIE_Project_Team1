@@ -4,7 +4,7 @@ from mushroom_rl.core import Core, Agent
 from loco_mujoco import LocoEnv
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "real_180.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
 agent = Agent.load(agent_file_path)
 
 # Initialize the humanoid environment
@@ -13,7 +13,7 @@ mdp = LocoEnv.make(env_id, use_box_feet=True)
 
 # Number of episodes to run
 num_episodes = 10
-
+total_steps = 0
 for episode in range(num_episodes):
     state = mdp.reset()  # Reset the environment for each episode
     done = False
@@ -32,7 +32,7 @@ for episode in range(num_episodes):
         # Update state
         state = next_state
         step += 1
-
+    total_steps += step
     print(f"Episode {episode + 1} completed")
 
-print("Interaction with the environment completed.")
+print(f"Average steps per episode: {total_steps / num_episodes}")

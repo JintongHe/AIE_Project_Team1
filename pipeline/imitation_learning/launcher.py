@@ -7,7 +7,7 @@ if __name__ == '__main__':
     TEST = False
     USE_CUDA = True
 
-    N_SEEDS = 3
+    N_SEEDS = 1
 
     launcher = Launcher(exp_name='loco_mujoco_evalution',
                         exp_file='experiment',
@@ -21,10 +21,10 @@ if __name__ == '__main__':
                         use_timestamp=True,
                         )
 
-    default_params = dict(n_epochs=200,
+    default_params = dict(n_epochs=80,
                           n_steps_per_epoch=100000,
-                          n_epochs_save=25,
-                          n_eval_episodes=10,
+                          n_epochs_save=5,
+                          n_eval_episodes=5,
                           n_steps_per_fit=1000,
                           use_cuda=USE_CUDA)
 

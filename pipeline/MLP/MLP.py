@@ -15,26 +15,26 @@ from ModelsAndUtils import MLP, get_right_ankle_substate, get_action_substate
 
 def main():
     # Initialize device with CPU fallback
-    # if torch.backends.mps.is_available():
-    #     device = torch.device("mps")
-    # elif torch.cuda.is_available():
-    #     device = torch.device("cuda")
-    # else:
-    #     device = torch.device("cpu")
-    device = torch.device("cpu")
+    if torch.backends.mps.is_available():
+        device = torch.device("mps")
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+    # device = torch.device("cpu")
     print(f"Using device: {device}")
 
     # Environment and expert agent setup
     env_id = "HumanoidTorque.walk.perfect"
     mdp = LocoEnv.make(env_id, use_box_feet=True)
 
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_80_prosthesis_inertia.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
     agent = Agent.load(agent_file_path)
 
     # Initialize the model
-    input_dim = 22  # Number of features in the substate
+    input_dim = 12  # Number of features in the substate
     output_dim = 1  # Number of actions (scalar prediction)
-    hidden_dim = 128  # Number of hidden units
+    hidden_dim = 256  # Number of hidden units
     model = MLP(input_dim, hidden_dim, output_dim).to(device)
     model.train()
 
@@ -54,7 +54,7 @@ def main():
     epochs_no_improve = 0
 
     # Define a path to save the best model
-    model_save_path = os.path.join(os.path.dirname(__file__), "mlp_state_22_hidden_128_perfect_80_prosthesis_inertia.pth")
+    model_save_path = os.path.join(os.path.dirname(__file__), "mlp_state_12_hidden_128_perfect_88.pth")
     state = mdp.reset()
     for epoch in range(num_epochs):
         # Reset environment at the beginning of each epoch

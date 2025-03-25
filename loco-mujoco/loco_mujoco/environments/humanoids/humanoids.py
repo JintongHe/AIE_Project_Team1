@@ -97,43 +97,43 @@ class HumanoidTorque(BaseHumanoid):
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
     30    Position of Joint wrist_dev_l                                                 -0.436332 0.610865 True     1   Angle [rad]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    31    Velocity of Joint pelvis_tx                                                   -inf      inf      False    1   Velocity [m/s]
+    17    Velocity of Joint pelvis_tx                                                   -inf      inf      False    1   Velocity [m/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    32    Velocity of Joint pelvis_tz                                                   -inf      inf      False    1   Velocity [m/s]
+    18    Velocity of Joint pelvis_tz                                                   -inf      inf      False    1   Velocity [m/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    33    Velocity of Joint pelvis_ty                                                   -inf      inf      False    1   Velocity [m/s]
+    19    Velocity of Joint pelvis_ty                                                   -inf      inf      False    1   Velocity [m/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    34    Velocity of Joint pelvis_tilt                                                 -inf      inf      False    1   Angular Velocity [rad/s]
+    20    Velocity of Joint pelvis_tilt                                                 -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    35    Velocity of Joint pelvis_list                                                 -inf      inf      False    1   Angular Velocity [rad/s]
+    21    Velocity of Joint pelvis_list                                                 -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    36    Velocity of Joint pelvis_rotation                                             -inf      inf      False    1   Angular Velocity [rad/s]
+    22    Velocity of Joint pelvis_rotation                                             -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    37    Velocity of Joint hip_flexion_r                                               -inf      inf      False    1   Angular Velocity [rad/s]
+    23    Velocity of Joint hip_flexion_r                                               -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    38    Velocity of Joint hip_adduction_r                                             -inf      inf      False    1   Angular Velocity [rad/s]
+    24    Velocity of Joint hip_adduction_r                                             -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    39    Velocity of Joint hip_rotation_r                                              -inf      inf      False    1   Angular Velocity [rad/s]
+    25    Velocity of Joint hip_rotation_r                                              -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    40    Velocity of Joint knee_angle_r                                                -inf      inf      False    1   Angular Velocity [rad/s]
+    26    Velocity of Joint knee_angle_r                                                -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    41    Velocity of Joint ankle_angle_r                                               -inf      inf      False    1   Angular Velocity [rad/s]
+    27    Velocity of Joint ankle_angle_r                                               -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    42    Velocity of Joint hip_flexion_l                                               -inf      inf      False    1   Angular Velocity [rad/s]
+    28    Velocity of Joint hip_flexion_l                                               -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    43    Velocity of Joint hip_adduction_l                                             -inf      inf      False    1   Angular Velocity [rad/s]
+    29    Velocity of Joint hip_adduction_l                                             -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    44    Velocity of Joint hip_rotation_l                                              -inf      inf      False    1   Angular Velocity [rad/s]
+    30    Velocity of Joint hip_rotation_l                                              -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    45    Velocity of Joint knee_angle_l                                                -inf      inf      False    1   Angular Velocity [rad/s]
+    31    Velocity of Joint knee_angle_l                                                -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    46    Velocity of Joint ankle_angle_l                                               -inf      inf      False    1   Angular Velocity [rad/s]
+    32    Velocity of Joint ankle_angle_l                                               -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    47    Velocity of Joint lumbar_extension                                            -inf      inf      False    1   Angular Velocity [rad/s]
+    33    Velocity of Joint lumbar_extension                                            -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    48    Velocity of Joint lumbar_bending                                              -inf      inf      False    1   Angular Velocity [rad/s]
+    34    Velocity of Joint lumbar_bending                                              -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
-    49    Velocity of Joint lumbar_rotation                                             -inf      inf      False    1   Angular Velocity [rad/s]
+    35    Velocity of Joint lumbar_rotation                                             -inf      inf      False    1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------
     50    Velocity of Joint arm_flex_r                                                  -inf      inf      True     1   Angular Velocity [rad/s]
     ----- ----------------------------------------------------------------------------- --------- -------- -------- --- ------------------------

@@ -40,20 +40,20 @@
         <joint name="hip_adduction_r" damping="5" stiffness="10" type="hinge" pos="0 0 0" axis="       1        0        0" limited="true" range=" -0.524   0.524" ref="0"></joint>
         <joint name="hip_rotation_r" damping="5" stiffness="20" type="hinge" pos="0 0 0" axis="       0        1        0" limited="true" range=" -2.0944   2.0944" ref="0"></joint>
         <body name="tibia_r" pos="-0.00167398 -0.365545        0" quat="1.0 0.0 0.0 0.0">
-          <geom name="tibia_r" type="mesh" mesh="tibia_r"></geom>
-          <geom name="fibula_r" type="mesh" mesh="fibula_r"></geom>
+          <geom name="tibia_r" type="mesh" mesh="tibia_r" rgba="1 0 0 1"></geom>
+          <geom name="fibula_r" type="mesh" mesh="fibula_r" rgba="1 0 0 1"></geom>
           <inertial pos="       0 -0.208485        0" mass="4.27289367601238" fullinertia="0.072432 0.00732943 0.073438        0        0        0"></inertial>
           <joint name="knee_angle_r" type="hinge" pos="0 0 0" axis="       0        0        1" limited="true" range=" -2.0944 0.174533" ref="0"></joint>
           <body name="talus_r" pos="       0 -0.480173        0" quat="1.0 0.0 0.0 0.0">
-            <geom name="talus_rv" type="mesh" mesh="talus_rv"></geom>
+            <geom name="talus_rv" type="mesh" mesh="talus_rv"  rgba="1 0 0 1"></geom>
             <inertial pos="       0        0        0" mass="0.11524999800438" fullinertia="0.00143714 0.00143714 0.00143714        0        0        0"></inertial>
             <joint name="ankle_angle_r" stiffness="10" damping="1" type="hinge" pos="0 0 0" axis="-0.105014 -0.174022 0.979126" limited="true" range=" -1.5708   1.5708" ref="0"></joint>
             <body name="calcn_r" pos="-0.0544606 -0.0468448 0.00884412" quat="1.0 0.0 0.0 0.0">
-              <geom name="r_foot" type="mesh" mesh="foot"></geom>
+              <geom name="r_foot" type="mesh" mesh="foot" rgba="1 0 0 1"></geom>
               <inertial pos="0.106552 0.0319656        0" mass="1.44062497505475" fullinertia="0.00183186 0.00510303 0.00536472        0        0        0"></inertial>
               <joint name="subtalar_angle_r" armature="0.01" type="hinge" pos="0 0 0" axis=" 0.78718 0.604747 -0.120949" limited="true" range=" -1.5708   1.5708" ref="0"></joint>
               <body name="toes_r" pos="0.190515 -0.00213104 0.00115076" quat="1.0 0.0 0.0 0.0">
-                <geom name="r_bofoot" type="mesh" mesh="bofoot"></geom>
+                <geom name="r_bofoot" type="mesh" mesh="bofoot"  rgba="1 0 0 1"></geom>
                 <inertial pos="0.036867 0.00639311 -0.0186466" mass="0.249631495677486" fullinertia="0.000130847 0.000261694 0.00130847        0        0        0"></inertial>
                 <joint name="mtp_angle_r" armature="0.01" type="hinge" pos="0 0 0" axis="-0.580954        0 0.813936" limited="true" range=" -1.5708   1.5708" ref="0"></joint>
               </body>

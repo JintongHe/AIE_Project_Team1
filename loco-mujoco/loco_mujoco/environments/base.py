@@ -29,8 +29,8 @@ class LocoEnv(MultiMuJoCo):
     """
 
     def __init__(self, xml_handles, action_spec, observation_spec, collision_groups=None, gamma=0.99, horizon=1000,
-                 n_substeps=10,  reward_type=None, reward_params=None, traj_params=None, random_start=True,
-                 init_step_no=None, timestep=0.001, use_foot_forces=False, default_camera_mode="follow",
+                 n_substeps=10,  reward_type=None, reward_params=None, traj_params=None, random_start=False,
+                 init_step_no=1, timestep=0.001, use_foot_forces=False, default_camera_mode="follow",
                  use_absorbing_states=True, domain_randomization_config=None, parallel_dom_rand=True,
                  N_worker_per_xml_dom_rand=4, **viewer_params):
         """
@@ -187,8 +187,9 @@ class LocoEnv(MultiMuJoCo):
         if self._random_env_reset:
             self._current_model_idx = np.random.randint(0, len(self._models))
         else:
-            self._current_model_idx = self._current_model_idx + 1 \
-                if self._current_model_idx < len(self._models) - 1 else 0
+            # self._current_model_idx = self._current_model_idx + 1 \
+            #     if self._current_model_idx < len(self._models) - 1 else 0
+            self._current_model_idx = 1
 
         self._model = self._models[self._current_model_idx]
         self._data = self._datas[self._current_model_idx]
