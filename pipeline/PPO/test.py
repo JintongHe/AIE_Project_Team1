@@ -105,10 +105,11 @@ def test_best_policy(policy, env, agent, num_episodes=10, max_steps=2000, device
     return episode_rewards
 
 def main():
-    if torch.backends.mps.is_available():
-        device = torch.device("mps") 
-    else: 
-        device = torch.device("cpu")
+    # if torch.backends.mps.is_available():
+    #     device = torch.device("mps") 
+    # else: 
+    #     device = torch.device("cpu")
+    device = 'cpu'
 
     # Initialize the humanoid environment
     env_id = "HumanoidTorque.walk.real"

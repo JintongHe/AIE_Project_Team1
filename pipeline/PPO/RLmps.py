@@ -70,30 +70,40 @@ class ValueNet(nn.Module):
 
 # PPO Buffer for storing trajectories
 class PPOBuffer:
-    def __init__(self, state_dim, action_dim, size, gamma=0.99, lam=0.95):
-        self.states = np.zeros((size, state_dim), dtype=np.float32)
-        self.actions = np.zeros((size, action_dim), dtype=np.float32)
-        self.advantages = np.zeros(size, dtype=np.float32)
-        self.rewards = np.zeros(size, dtype=np.float32)
-        self.returns = np.zeros(size, dtype=np.float32)
-        self.values = np.zeros(size, dtype=np.float32)
-        self.log_probs = np.zeros(size, dtype=np.float32)
-        self.dones = np.zeros(size, dtype=np.float32)
+    def __init__(self, state_dim, action_dim, size, gamma=0.99, lam=0.95, device="mps"):
+        self.device = device
+        # Initialize tensors directly on the target device
+        self.states = torch.zeros((size, state_dim), dtype=torch.float32, device=device)
+        self.actions = torch.zeros((size, action_dim), dtype=torch.float32, device=device)
+        self.advantages = torch.zeros(size, dtype=torch.float32, device=device)
+        self.rewards = torch.zeros(size, dtype=torch.float32, device=device)
+        self.returns = torch.zeros(size, dtype=torch.float32, device=device)
+        self.values = torch.zeros(size, dtype=torch.float32, device=device)
+        self.log_probs = torch.zeros(size, dtype=torch.float32, device=device)
+        self.dones = torch.zeros(size, dtype=torch.float32, device=device)
         
         self.gamma = gamma
         self.lam = lam
         self.ptr, self.path_start_idx, self.max_size = 0, 0, size
         
     def store(self, state, action, reward, value, log_prob, done):
-        """Store one transition in the buffer"""
+        """Store one transition in the buffer directly as tensors"""
         assert self.ptr < self.max_size
         
-        # Convert tensors to CPU before storing in NumPy arrays
-        if isinstance(state, torch.Tensor):
-            state = state.cpu().numpy()
-        if isinstance(action, torch.Tensor):
-            action = action.cpu().numpy()
+        # Convert inputs to tensors on the target device if they aren't already
+        if not isinstance(state, torch.Tensor):
+            state = torch.tensor(state, dtype=torch.float32, device=self.device)
+        elif state.device != self.device:
+            state = state.to(self.device)
             
+        if not isinstance(action, torch.Tensor):
+            action = torch.tensor(action, dtype=torch.float32, device=self.device)
+        elif action.device != self.device:
+            action = action.to(self.device)
+        
+        done = float(done)
+            
+        # Store the data
         self.states[self.ptr] = state
         self.actions[self.ptr] = action
         self.rewards[self.ptr] = reward
@@ -104,54 +114,72 @@ class PPOBuffer:
 
         
     def finish_path(self, last_value=0):
-        """Calculate advantages and returns using GAE-Lambda"""
+        """Calculate advantages and returns using GAE-Lambda with PyTorch operations"""
         path_slice = slice(self.path_start_idx, self.ptr)
-        rewards = np.append(self.rewards[path_slice], last_value)
-        values = np.append(self.values[path_slice], last_value)
-        dones = np.append(self.dones[path_slice], 0)
+        
+        # Append last_value to the current trajectory's tensors
+        rewards = torch.cat([self.rewards[path_slice], 
+                            torch.tensor([last_value], device=self.device)])
+        values = torch.cat([self.values[path_slice], 
+                        torch.tensor([last_value], device=self.device)])
+        dones = torch.cat([self.dones[path_slice], 
+                        torch.tensor([0], device=self.device)])
         
         # GAE-Lambda advantage calculation
         deltas = rewards[:-1] + self.gamma * values[1:] * (1 - dones[:-1]) - values[:-1]
-        self.advantages[path_slice] = self._discount_cumsum(deltas, self.gamma * self.lam)
         
-        # Compute returns for value function targets
-        self.returns[path_slice] = self._discount_cumsum(rewards[:-1], self.gamma)
+        # Calculate advantages using PyTorch operations
+        self.advantages[path_slice] = self._discount_cumsum_torch(deltas, self.gamma * self.lam)
+        
+        # Returns for value function targets
+        self.returns[path_slice] = self._discount_cumsum_torch(rewards[:-1], self.gamma)
         
         self.path_start_idx = self.ptr
+
         
-    def _discount_cumsum(self, x, discount):
-        """Calculate discounted cumulative sum (used for returns and GAE)"""
-        return scipy.signal.lfilter([1], [1, float(-discount)], x[::-1], axis=0)[::-1]
+    def _discount_cumsum_torch(self, x, discount):
+        """PyTorch implementation of discount cumulative sum"""
+        result = torch.zeros_like(x)
+        n = x.shape[0]
+    
+        # More efficient PyTorch implementation
+        for i in range(n-1, -1, -1):
+            result[i] = x[i] + (result[i+1] * discount if i < n-1 else 0)
+        
+        return result
+
     
     def get(self):
         """Get all data from the buffer and normalize advantages"""
-        assert self.ptr == self.max_size  # Buffer must be full before we can use it
+        assert self.ptr == self.max_size
         self.ptr, self.path_start_idx = 0, 0
         
-        # Normalize advantages
-        adv_mean = np.mean(self.advantages)
-        adv_std = np.std(self.advantages) + 1e-8
+        # Normalize advantages on device
+        adv_mean = self.advantages.mean()
+        adv_std = self.advantages.std() + 1e-8
         self.advantages = (self.advantages - adv_mean) / adv_std
         
-        data = dict(
-            states=self.states,
-            actions=self.actions,
-            returns=self.returns,
-            advantages=self.advantages,
-            log_probs=self.log_probs
-        )
-        return {k: torch.as_tensor(v, dtype=torch.float32) for k, v in data.items()}
+        # Return dictionary of tensors already on the correct device
+        return {
+            'states': self.states,
+            'actions': self.actions,
+            'returns': self.returns,
+            'advantages': self.advantages,
+            'log_probs': self.log_probs
+        }
+        
     def sample_batch(self, batch_size):
         """Sample a random batch of data from the buffer"""
-        indices = np.random.choice(self.max_size, batch_size, replace=False)
-        batch = dict(
-            states=self.states[indices],
-            actions=self.actions[indices],
-            returns=self.returns[indices],
-            advantages=self.advantages[indices],
-            log_probs=self.log_probs[indices]
-        )
-        return {k: torch.as_tensor(v, dtype=torch.float32) for k, v in batch.items()}
+        # Generate random indices directly on device
+        indices = torch.randint(0, self.max_size, (batch_size,), device=self.device)
+        return {
+            'states': self.states[indices],
+            'actions': self.actions[indices],
+            'returns': self.returns[indices],
+            'advantages': self.advantages[indices],
+            'log_probs': self.log_probs[indices]
+        }
+
     
 
 # Compute KL divergence between old and new policy distributions
@@ -204,8 +232,8 @@ def ppo_train(policy, value_function, env, agent, state_dim, action_dim, num_epo
     for t in range(num_epochs * steps_per_epoch):
         # Get action, value, and log probability from current policy
         with torch.no_grad():
-            state_tensor = torch.as_tensor(ankle_state, dtype=torch.float32).to(device)
-            ankle_state_tensor = torch.as_tensor(ankle_state, dtype=torch.float32).to(device)
+            state_tensor = torch.as_tensor(ankle_state, dtype=torch.float32, device=device)
+            ankle_state_tensor = torch.as_tensor(ankle_state, dtype=torch.float32, device=device)
             action, log_prob = policy.sample_action(ankle_state_tensor)
             value = value_function(ankle_state_tensor)
             
@@ -400,18 +428,24 @@ def main():
     #     device = torch.device("mps") 
     # else: 
     #     device = torch.device("cpu")
-    device = 'cpu'
+    # Check if MPS is available
+    if torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("Using MPS device")
+    else:
+        device = torch.device("cpu")
+        print("MPS not available, using CPU")
 
     # Initialize the humanoid environment
     env_id = "HumanoidTorque.walk.real"
-    env = LocoEnv.make(env_id, use_box_feet=True)
+    env = LocoEnv.make(env_id, use_box_feet=True, device=device)
 
     # Load the expert agent
     agent_file_path = os.path.join(os.path.dirname(__file__), "real_180.msh")
     agent = Agent.load(agent_file_path)
 
     #Initialize the model
-    state_dim = 12  # Number of features in the substate
+    state_dim = 22  # Number of features in the substate
     value_dim = 36
     action_dim = 1  # Number of actions
     hidden_dim = 64  # Number of hidden units
@@ -442,11 +476,11 @@ def main():
     )
 
     # Save the best policy state
-    torch.save(best_policy_state, 'RL_survival_12_states_noprosthetic.pth')
+    torch.save(best_policy_state, 'walker_rewards_with_expert.pth')
     # After training, load the best policy
     policy.load_state_dict(best_policy_state)
 
-    # Run the test functio/
+    # Run the test function
     print("\nTesting the best policy:")
     test_rewards = test_best_policy(policy, env, agent, num_episodes=10, device=device)
 

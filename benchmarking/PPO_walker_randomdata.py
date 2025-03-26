@@ -78,6 +78,13 @@ class PPOBuffer:
     def store(self, state, action, reward, value, log_prob, done):
         """Store one transition in the buffer"""
         assert self.ptr < self.max_size
+        
+        # Convert tensors to CPU before storing in NumPy arrays
+        if isinstance(state, torch.Tensor):
+            state = state.cpu().numpy()
+        if isinstance(action, torch.Tensor):
+            action = action.cpu().numpy()
+            
         self.states[self.ptr] = state
         self.actions[self.ptr] = action
         self.rewards[self.ptr] = reward
@@ -367,18 +374,18 @@ def main():
         policy=policy,
         value_function=value_function,
         env=env,
-        num_epochs=500,           # Increased for BipedalWalker
+        num_epochs=1000,           # Increased for BipedalWalker
         steps_per_epoch=4000,     # Steps per epoch
         gamma=0.99,               # Discount factor
         lam=0.95,                 # GAE-Lambda parameter
-        clip_ratio=0.2,           # PPO clip ratio
+        clip_ratio=0.05,           # PPO clip ratio
         pi_lr=3e-4,               # Policy learning rate
         vf_lr=1e-3,               # Value function learning rate
         train_pi_iters=80,        # Policy optimization iterations
         train_v_iters=80,         # Value function iterations
-        target_kl=0.01,           # Target KL divergence for early stopping
+        target_kl=0.1,           # Target KL divergence for early stopping
         max_ep_len=2000,  
-        batch_size=128,        # Maximum episode length for BipedalWalker
+        batch_size=64,        # Maximum episode length for BipedalWalker
         device=device
     )
     

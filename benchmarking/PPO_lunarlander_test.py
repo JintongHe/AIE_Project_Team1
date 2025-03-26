@@ -10,12 +10,13 @@ import os
 
 
 # Policy Network for continuous actions
+# Policy Network for continuous actions - adjusted for BipedalWalker
 class PolicyNet(nn.Module):
     def __init__(self, state_dim, action_dim):
         super(PolicyNet, self).__init__()
-        self.fc1 = nn.Linear(state_dim, 64)
-        self.fc2 = nn.Linear(64, 32)
-        self.fc3 = nn.Linear(32, 32)
+        self.fc1 = nn.Linear(state_dim, 128)  # Increased network size
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 32)
         
         # Mean output for continuous actions
         self.mean = nn.Linear(32, action_dim)
@@ -28,7 +29,7 @@ class PolicyNet(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
-        mean = F.tanh(self.mean(x))
+        mean = F.tanh(self.mean(x))  # Tanh ensures output in [-1, 1] range
         std = torch.exp(torch.clamp(self.logstd(x), -9, 0.5))
         return mean, std
     
@@ -101,7 +102,7 @@ def main():
     action_dim = test_env.action_space.shape[0] 
     policy = PolicyNet(state_dim, action_dim)
     # Load the best policy for testing
-    policy_load_path = os.path.join(os.path.dirname(__file__), "lunar_lander_ppo_best_model.pth")
+    policy_load_path = os.path.join(os.path.dirname(__file__), "official_lunarlander_ppo.pth")
     policy.load_state_dict(torch.load(policy_load_path))
     policy.eval()
 

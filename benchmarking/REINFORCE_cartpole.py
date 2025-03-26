@@ -140,6 +140,7 @@ def reinforce_train(policy, value_function, env, num_epochs, episode_steps, alph
         
         # Print the average reward per epoch
         print(f'Epoch {t+1}, Reward: {epoch_reward}')
+    return policy.state_dict().copy()
 
 def test_policy(policy, env, num_episodes, device, render_delay=0.01):
     """
@@ -210,12 +211,19 @@ policy = PolicyNet(state_dim, action_dim)
 value_function = ValueNet(state_dim)
 
 # Set the device - you can use 'cuda', 'mps', or 'cpu' depending on what's available
-device = torch.device("cuda" if torch.cuda.is_available() else 
-                     "mps" if torch.backends.mps.is_available() else 
-                     "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else 
+#                      "mps" if torch.backends.mps.is_available() else 
+#                      "cpu")
+
+device = 'cpu'
 
 # Train the policy
-reinforce_train(policy, value_function, env, num_epochs=500, episode_steps=500, alpha=0.01, gamma=0.99, device=device)
+final_policy = reinforce_train(policy, value_function, env, num_epochs=400, episode_steps=500, alpha=0.01, gamma=0.99, device=device)
+
+# Save the best policy to a file
+model_save_path = "official_cartpole.pth"
+torch.save(final_policy, model_save_path)
+print(f"Best model saved to {model_save_path}")
 
 # Create a test environment with rendering enabled
 test_env = gym.make('CartPole-v1', render_mode="human")
@@ -227,3 +235,5 @@ test_rewards = test_policy(policy, test_env, num_episodes=5, device=device)
 # Close the environments
 env.close()
 test_env.close()
+
+

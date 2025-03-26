@@ -7,13 +7,13 @@ import numpy as np
 import scipy.signal
 import time
 
-# Policy Network for continuous actions
+# Policy Network for continuous actions - adjusted for BipedalWalker
 class PolicyNet(nn.Module):
     def __init__(self, state_dim, action_dim):
         super(PolicyNet, self).__init__()
-        self.fc1 = nn.Linear(state_dim, 64)
-        self.fc2 = nn.Linear(64, 32)
-        self.fc3 = nn.Linear(32, 32)
+        self.fc1 = nn.Linear(state_dim, 128)  # Increased network size
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 32)
         
         # Mean output for continuous actions
         self.mean = nn.Linear(32, action_dim)
@@ -26,7 +26,7 @@ class PolicyNet(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
-        mean = F.tanh(self.mean(x))
+        mean = F.tanh(self.mean(x))  # Tanh ensures output in [-1, 1] range
         std = torch.exp(torch.clamp(self.logstd(x), -9, 0.5))
         return mean, std
     
@@ -50,9 +50,9 @@ class PolicyNet(nn.Module):
 class ValueNet(nn.Module):
     def __init__(self, state_dim):
         super(ValueNet, self).__init__()
-        self.fc1 = nn.Linear(state_dim, 64)
-        self.fc2 = nn.Linear(64, 32)
-        self.fc3 = nn.Linear(32, 1)
+        self.fc1 = nn.Linear(state_dim, 128)
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 1)
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
@@ -78,6 +78,13 @@ class PPOBuffer:
     def store(self, state, action, reward, value, log_prob, done):
         """Store one transition in the buffer"""
         assert self.ptr < self.max_size
+        
+        # Convert tensors to CPU before storing in NumPy arrays
+        if isinstance(state, torch.Tensor):
+            state = state.cpu().numpy()
+        if isinstance(action, torch.Tensor):
+            action = action.cpu().numpy()
+            
         self.states[self.ptr] = state
         self.actions[self.ptr] = action
         self.rewards[self.ptr] = reward
@@ -124,6 +131,19 @@ class PPOBuffer:
             log_probs=self.log_probs
         )
         return {k: torch.as_tensor(v, dtype=torch.float32) for k, v in data.items()}
+    
+    def sample_batch(self, batch_size):
+        """Sample a random batch of data from the buffer"""
+        indices = np.random.choice(self.max_size, batch_size, replace=False)
+        batch = dict(
+            states=self.states[indices],
+            actions=self.actions[indices],
+            returns=self.returns[indices],
+            advantages=self.advantages[indices],
+            log_probs=self.log_probs[indices]
+        )
+        return {k: torch.as_tensor(v, dtype=torch.float32) for k, v in batch.items()}
+
 
 # Compute KL divergence between old and new policy distributions
 def compute_kl(policy, states, old_mean, old_std):
@@ -133,21 +153,25 @@ def compute_kl(policy, states, old_mean, old_std):
     kl = torch.distributions.kl_divergence(old_dist, new_dist).sum(dim=-1).mean().item()
     return kl
 
-# PPO main training function
-def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=4000,
-              gamma=0.99, lam=0.97, clip_ratio=0.2, pi_lr=3e-4, vf_lr=1e-3,
-              train_pi_iters=80, train_v_iters=80, target_kl=0.01, max_ep_len=1000,
-              device="mps"):
+# PPO main training function - adjusted for BipedalWalker
+def ppo_train(policy, value_function, env, num_epochs=200, steps_per_epoch=4000,
+              gamma=0.99, lam=0.95, clip_ratio=0.2, pi_lr=3e-4, vf_lr=1e-3,
+              train_pi_iters=80, train_v_iters=80, target_kl=0.01, max_ep_len=2000,
+              batch_size=64, device="cpu"):
     """
-    PPO-Clip algorithm implementation as described in Spinning Up
+    PPO-Clip algorithm implementation for BipedalWalker with mini-batch updates
     """
     # Set up optimizers
-    policy_optimizer = torch.optim.Adam(policy.parameters(), lr=pi_lr)
+    policy_optimizer = torch.optim.Adam(policy.parameters(), lr=pi_lr, eps=1e-5)
     value_optimizer = torch.optim.Adam(value_function.parameters(), lr=vf_lr)
     
     # Set device
     policy.to(device)
     value_function.to(device)
+
+    # Create a copy of the policy to represent the policy from the previous epoch
+    prev_epoch_policy = PolicyNet(env.observation_space.shape[0], env.action_space.shape[0]).to(device)
+    prev_epoch_policy.load_state_dict(policy.state_dict())
     
     # Setup state/action dimensions
     state_dim = env.observation_space.shape[0]
@@ -220,18 +244,24 @@ def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=4000,
             
             # Get the data from the buffer
             data = buffer.get()
-            states = data['states'].to(device)
-            actions = data['actions'].to(device)
-            returns = data['returns'].to(device)
-            advantages = data['advantages'].to(device)
-            old_log_probs = data['log_probs'].to(device)
             
             # Store old policy parameters for KL calculation
             with torch.no_grad():
-                old_mean, old_std = policy.forward(states)
+                all_states = torch.as_tensor(buffer.states, dtype=torch.float32).to(device)
+                old_mean, old_std = policy.forward(all_states)
             
-            # Update policy using the PPO-Clip objective
+            # Update policy using mini-batches
             for i in range(train_pi_iters):
+                # Sample a fresh batch
+                batch = buffer.sample_batch(batch_size)
+                states = batch['states'].to(device)
+                actions = batch['actions'].to(device)
+                advantages = batch['advantages'].to(device)
+                # Compute old log probabilities using prev_epoch_policy
+                with torch.no_grad():
+                    old_dist = prev_epoch_policy.get_distribution(states)
+                    old_log_probs = old_dist.log_prob(actions).sum(dim=-1)
+                
                 policy_optimizer.zero_grad()
                 
                 # Get current distribution and log probabilities
@@ -246,21 +276,27 @@ def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=4000,
                 policy_loss = -torch.min(ratio * advantages, clip_adv).mean()
                 
                 # Add entropy bonus for exploration
-                entropy_loss = -0.01 * dist.entropy().sum(dim=-1).mean()
-                total_policy_loss = policy_loss + entropy_loss
+                # entropy_loss = -0.01 * dist.entropy().sum(dim=-1).mean()
+                # total_policy_loss = policy_loss + entropy_loss
                 
                 # Update policy
-                total_policy_loss.backward()
+                policy_loss.backward()
                 policy_optimizer.step()
                 
-                # Calculate KL divergence and check for early stopping
-                kl = compute_kl(policy, states, old_mean, old_std)
-                if kl > 1.5 * target_kl:
-                    print(f"Early stopping at step {i+1} due to reaching max KL {kl:.3f}")
-                    break
+                # Check KL divergence every 20 iterations to save computation
+                if (i+1) % 20 == 0:
+                    kl = compute_kl(policy, all_states, old_mean, old_std)
+                    if kl > 1.5 * target_kl:
+                        print(f"Early stopping at step {i+1} due to reaching max KL {kl:.3f}")
+                        break
             
-            # Update value function
+            # Update value function with mini-batches too
             for _ in range(train_v_iters):
+                # Sample a fresh batch
+                batch = buffer.sample_batch(batch_size)
+                states = batch['states'].to(device)
+                returns = batch['returns'].to(device)
+                
                 value_optimizer.zero_grad()
                 
                 # Calculate value loss
@@ -280,11 +316,13 @@ def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=4000,
                 if mean_reward > best_reward:
                     best_reward = mean_reward
                     best_policy_state = policy.state_dict().copy()
+            prev_epoch_policy.load_state_dict(policy.state_dict())
     
     return best_policy_state, best_reward
 
+
 # Test the trained policy
-def test_policy(policy, env, num_episodes=5, device="mps", render_delay=0.01):
+def test_policy(policy, env, num_episodes=5, device="mps"):
     policy.eval()
     test_rewards = []
     
@@ -294,13 +332,10 @@ def test_policy(policy, env, num_episodes=5, device="mps", render_delay=0.01):
         done = False
         
         while not done:
-            env.render()
-            time.sleep(render_delay)
-            
             state_tensor = torch.tensor(state, dtype=torch.float32).to(device)
             
             with torch.no_grad():
-                action, _ = policy.sample_action(state_tensor)
+                action = policy.get_best_action(state_tensor)
             
             next_state, reward, terminated, truncated, _ = env.step(action.cpu().numpy())
             
@@ -322,34 +357,35 @@ def main():
     env = gym.make("LunarLander-v3", continuous=True)
     
     # Define the state and action dimensions
-    state_dim = env.observation_space.shape[0]  # 8 for LunarLander
-    action_dim = env.action_space.shape[0]      # 2 for LunarLander continuous
+    state_dim = env.observation_space.shape[0]  # 24 for BipedalWalker
+    action_dim = env.action_space.shape[0]      # 4 for BipedalWalker
     
     # Initialize the policy and value networks
     policy = PolicyNet(state_dim, action_dim)
     value_function = ValueNet(state_dim)
     
     # Set the device
-    device = torch.device(#"mps" if torch.backends.mps.is_available() else 
+    device = torch.device( 
                      "cuda" if torch.cuda.is_available() else 
-                     "cpu")     
+                     "cpu") 
     
     # Train using PPO
     best_policy_state, best_reward = ppo_train(
         policy=policy,
         value_function=value_function,
         env=env,
-        num_epochs=10,           # Number of epochs
+        num_epochs=500,           # Increased for BipedalWalker
         steps_per_epoch=4000,     # Steps per epoch
         gamma=0.99,               # Discount factor
-        lam=0.97,                 # GAE-Lambda parameter
+        lam=0.95,                 # GAE-Lambda parameter
         clip_ratio=0.2,           # PPO clip ratio
         pi_lr=3e-4,               # Policy learning rate
         vf_lr=1e-3,               # Value function learning rate
-        train_pi_iters=80,        # Max policy optimization iterations
-        train_v_iters=80,         # Value function optimization iterations
-        target_kl=0.01,           # Target KL divergence for early stopping
-        max_ep_len=1000,          # Maximum episode length
+        train_pi_iters=80,        # Policy optimization iterations
+        train_v_iters=80,         # Value function iterations
+        target_kl=0.1,           # Target KL divergence for early stopping
+        max_ep_len=2000,  
+        batch_size=64,        # Maximum episode length for BipedalWalker
         device=device
     )
     
@@ -357,7 +393,7 @@ def main():
     policy.load_state_dict(best_policy_state)
 
     # Save the best policy to a file
-    model_save_path = "lunar_lander_ppo_best_model.pth"
+    model_save_path = "bipedal_walker_ppo_best_model.pth"
     torch.save(best_policy_state, model_save_path)
     print(f"Best model saved to {model_save_path} with reward {best_reward:.2f}")
     
