@@ -120,7 +120,7 @@ def main():
     agent = Agent.load(agent_file_path)
 
     #Initialize the model
-    state_dim = 16  # Number of features in the substate
+    state_dim = 22  # Number of features in the substate
     action_dim = 1  # Number of actions
     policy = PolicyNet(state_dim, action_dim).to(device)
     policy_load_path = os.path.join(os.path.dirname(__file__), "running.pth")
