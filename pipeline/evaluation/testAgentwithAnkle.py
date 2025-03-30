@@ -8,7 +8,7 @@ import keyboard  # Added for key press detection
 import time
 
 # Check if CUDA is available, otherwise fallback to CPU
-device = "cpu"
+device = "cuda"
 print(f"Using device: {device}")
 
 # Initialize the humanoid environment

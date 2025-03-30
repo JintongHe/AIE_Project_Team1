@@ -202,12 +202,12 @@ def main():
     num_steps = 1000
 
     # Load expert agent
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_80_prosthesis_inertia.msh")
     agent = Agent.load(agent_file_path)
 
     # Load MLP model
     model = MLP(22, 128, 1)
-    model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_22_hidden_128_perfect_88.pth")
+    model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_22_hidden_128_perfect_80_prosthesis_inertia.pth")
     model.load_state_dict(torch.load(model_load_path, map_location=torch.device('cpu')))
     model.eval()
 

@@ -187,9 +187,9 @@ class LocoEnv(MultiMuJoCo):
         if self._random_env_reset:
             self._current_model_idx = np.random.randint(0, len(self._models))
         else:
-            # self._current_model_idx = self._current_model_idx + 1 \
-            #     if self._current_model_idx < len(self._models) - 1 else 0
-            self._current_model_idx = 1
+            self._current_model_idx = self._current_model_idx + 1 \
+                if self._current_model_idx < len(self._models) - 1 else 0
+            # self._current_model_idx = 1
 
         self._model = self._models[self._current_model_idx]
         self._data = self._datas[self._current_model_idx]
