@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c561c074-0481-41b4-8d9d-886111c36a06" name="Changes" comment="Upload mlp model and plotting files,">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loco-mujoco/loco_mujoco/environments/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/loco-mujoco/loco_mujoco/environments/base.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loco-mujoco/loco_mujoco/environments/data/humanoid/humanoid_torque_prosthesis.xml" beforeDir="false" afterPath="$PROJECT_DIR$/loco-mujoco/loco_mujoco/environments/data/humanoid/humanoid_torque_prosthesis.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loco-mujoco/loco_mujoco/environments/humanoids/base_humanoid.py" beforeDir="false" afterPath="$PROJECT_DIR$/loco-mujoco/loco_mujoco/environments/humanoids/base_humanoid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ls-iq" beforeDir="false" afterPath="$PROJECT_DIR$/ls-iq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/MLP/MLP.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/MLP/MLP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/evaluation/mlp_state_36_hidden_128_perfect_88.pth" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/evaluation/mlp_state_36_hidden_128_perfect_88.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/evaluation/run-gait-analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/evaluation/run-gait-analysis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/evaluation/testAgentwithAnkle.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/evaluation/testAgentwithAnkle.py" afterDir="false" />
-    </list>
+    <list default="true" id="c561c074-0481-41b4-8d9d-886111c36a06" name="Changes" comment="Resolve changes" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
