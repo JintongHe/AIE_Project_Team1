@@ -4,11 +4,11 @@ from mushroom_rl.core import Core, Agent
 from loco_mujoco import LocoEnv
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "real_180.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "best_agent.msh")
 agent = Agent.load(agent_file_path)
 
 # Initialize the humanoid environment
-env_id = "HumanoidTorque.walk.perfect"
+env_id = "HumanoidTorque.run.perfect"
 mdp = LocoEnv.make(env_id, use_box_feet=True)
 
 # Number of episodes to run

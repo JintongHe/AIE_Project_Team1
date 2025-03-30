@@ -112,18 +112,18 @@ def main():
     device = 'cpu'
 
     # Initialize the humanoid environment
-    env_id = "HumanoidTorque.walk.real"
+    env_id = "HumanoidTorque.run.perfect"
     env = LocoEnv.make(env_id, use_box_feet=True)
 
     # Load the expert agent
-    agent_file_path = os.path.join(os.path.dirname(__file__), "real_180.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "best_agent.msh")
     agent = Agent.load(agent_file_path)
 
     #Initialize the model
-    state_dim = 22  # Number of features in the substate
+    state_dim = 16  # Number of features in the substate
     action_dim = 1  # Number of actions
     policy = PolicyNet(state_dim, action_dim).to(device)
-    policy_load_path = os.path.join(os.path.dirname(__file__), "noexpert800.pth")
+    policy_load_path = os.path.join(os.path.dirname(__file__), "running.pth")
     policy.load_state_dict(torch.load(policy_load_path))
     policy.eval()
     print(f"Model weights loaded from {policy_load_path}")

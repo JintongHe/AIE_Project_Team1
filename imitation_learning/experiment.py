@@ -13,7 +13,7 @@ from loco_mujoco import LocoEnv
 from utils import get_agent
 
 
-def experiment(env_id: str = "HumanoidTorque.walk.real",
+def experiment(env_id: str = "HumanoidTorque.run.perfect",
                n_epochs: int = 450,
                n_steps_per_epoch: int = 50000,
                n_steps_per_fit: int = 1024,
@@ -41,6 +41,9 @@ def experiment(env_id: str = "HumanoidTorque.walk.real",
     agent = get_agent(env_id, mdp, use_cuda, sw)
     core = Core(agent, mdp)
 
+    best_R_mean = -np.inf  # Initialize the best reward mean
+    best_agent = None
+
     for epoch in range(n_epochs):
         print(f"starting epoch {epoch}")
         # train
@@ -57,10 +60,21 @@ def experiment(env_id: str = "HumanoidTorque.walk.real",
         sw.add_scalar("Eval_L-stochastic", L, epoch)
         agent_saver.save(core.agent, R_mean)
 
-        # Save the agent every 100 epochs
+        # Save the agent if it achieves the best mean reward
+        if R_mean > best_R_mean:
+            best_R_mean = R_mean
+            best_agent = core.agent
+            print(f"New best agent saved with R_mean: {best_R_mean}")
+
+        # Save the agent every 90 epochs
         if epoch >= 90 and epoch % 90 == 0:
             agent_path = os.path.join(results_dir, f'agent_epoch_{epoch}.msh')
             core.agent.save(agent_path, full_save=True)
+    if best_agent is not None:
+        # Save the best agent
+        best_agent_path = os.path.join(results_dir, 'best_agent.msh')
+        best_agent.save(best_agent_path, full_save=True)
+        print(f"Best agent saved with R_mean: {best_R_mean}")
 
     agent_saver.save_curr_best_agent()
     print("Finished.")
