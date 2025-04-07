@@ -14,7 +14,7 @@ from utils import get_agent
 
 
 def experiment(env_id: str = "HumanoidTorque.run.perfect",
-               n_epochs: int = 450,
+               n_epochs: int = 250,
                n_steps_per_epoch: int = 50000,
                n_steps_per_fit: int = 1024,
                n_eval_episodes: int = 50,
