@@ -7,6 +7,7 @@ from loco_mujoco import LocoEnv
 agent_file_path = os.path.join(os.path.dirname(__file__), "real_180.msh")
 agent = Agent.load(agent_file_path)
 
+
 # Initialize the humanoid environment
 env_id = "HumanoidTorque.walk.perfect"
 mdp = LocoEnv.make(env_id, use_box_feet=True)
