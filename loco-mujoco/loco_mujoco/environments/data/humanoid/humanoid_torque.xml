@@ -282,8 +282,6 @@
     <mesh name="thumb_proximal_lvs" file="meshes/thumb_proximal_lvs.stl" scale="0.905691 0.905691 0.905691"></mesh>
     <mesh name="thumb_distal_lvs" file="meshes/thumb_distal_lvs.stl" scale="0.905691 0.905691 0.905691"></mesh>
 
-    <!-- <mesh name="OSL (fine)" file="meshes\OSL v2.0 Assembly (fine).stl" scale="1.0 1.0 1.0"></mesh> -->
-    <!-- <mesh name="OSL (medium)" file="meshes\OSL v2.0 Assembly (medium).stl" scale="1.0 1.0 1.0"></mesh> -->
     <mesh name="Simplified OSL (medium)" file="meshes\simplify_OSL v2.0 Assembly (medium).stl" scale="1.5 1.5 1.5"></mesh>
     <mesh name="corrected OSL" file="meshes\corrected_osl.stl" scale="1 1 1"></mesh>
     <!-- <mesh name="OSL Foot" file="meshes\osl_foot.stl" scale="1 1 1"></mesh> -->
