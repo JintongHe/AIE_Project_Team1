@@ -217,7 +217,11 @@ def ppo_train(policy, value_function, env, agent, state_dim, action_dim, num_epo
         next_state, reward, done, _ = env.step(body_action)
         
         # Calculate reward as MSE between expert and policy actions
-        reward = -F.mse_loss(torch.tensor(expert_action).to(device), torch.tensor(action).to(device)) + 1
+        # reward = -F.mse_loss(torch.tensor(expert_action).to(device), torch.tensor(action).to(device)) + 1
+        if done:
+            reward = -100
+        else:
+            reward = 1
         
         # Store trajectory in buffer
         buffer.store(ankle_state, action, reward, value.item(), log_prob.item(), done)
@@ -405,10 +409,9 @@ def main():
     # Load the expert agent
     agent_file_path = os.path.join(os.path.dirname(__file__), "real_180.msh")
     agent = Agent.load(agent_file_path)
-    
 
     #Initialize the model
-    state_dim = 22  # Number of features in the substate
+    state_dim = 12  # Number of features in the substate
     value_dim = 36
     action_dim = 1  # Number of actions
     hidden_dim = 64  # Number of hidden units
@@ -433,17 +436,17 @@ def main():
         train_pi_iters=80,        # Policy optimization iterations
         train_v_iters=80,         # Value function iterations
         target_kl=0.1,           # Target KL divergence for early stopping
-        max_ep_len=2000,          # Maximum episode length for BipedalWalker
+        max_ep_len=800,          # Maximum episode length for BipedalWalker
         batch_size=64,            # Batch size for training
         device=device
     )
 
     # Save the best policy state
-    torch.save(best_policy_state, 'walker_rewards_with_expert.pth')
+    torch.save(best_policy_state, 'RL_survival_12_states_noprosthetic.pth')
     # After training, load the best policy
     policy.load_state_dict(best_policy_state)
 
-    # Run the test function
+    # Run the test functio/
     print("\nTesting the best policy:")
     test_rewards = test_best_policy(policy, env, agent, num_episodes=10, device=device)
 

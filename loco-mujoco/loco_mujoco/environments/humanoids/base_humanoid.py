@@ -459,6 +459,7 @@ class BaseHumanoid(LocoEnv):
         foot_r = xml_handle.find("geom", "r_foot")
         bofoot_r = xml_handle.find("geom", "r_bofoot")
         foot_l = xml_handle.find("geom", "l_foot")
+        # foot_l = xml_handle.find("geom", "OSL Foot")
         bofoot_l = xml_handle.find("geom", "l_bofoot")
         foot_r.contype = 0
         foot_r.conaffinity = 0
