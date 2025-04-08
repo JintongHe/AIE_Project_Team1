@@ -6,7 +6,7 @@ from loco_mujoco import LocoEnv
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from ModelsAndUtils import MLP, get_right_ankle_substate, get_action_substate
+from pipeline.ModelsAndUtils import MLP, get_right_ankle_substate, get_action_substate
 
 
 def main():
