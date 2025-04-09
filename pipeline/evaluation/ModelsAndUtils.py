@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import copy
 from torch.distributions import Normal
+import torch.optim as optim
 
 
 #Reward function
@@ -60,6 +61,48 @@ def ankle_training_reward(state, action, next_state):
 #Extract ankle action from action
 def get_right_ankle_substate(state):
     """Extract relevant features for ankle control"""
+
+    #36
+    # relevant_indices = [
+    #     0,  # q_pelvis_ty
+    #     1,  # q_pelvis_tilt
+    #     2,  # q_pelvis_list
+    #     3,  #q_pelvis_rotation
+    #     4,  #q_hip_flexion_r
+    #     5,  #q_hip_adduction_r
+    #     6,  #q_hip_rotation_r
+    #     7,  #q_knee_angle_r
+    #     8,  #q_ankle_angle_r
+    #     9,  #q_hip_flexion_l
+    #     10,  #q_hip_adduction_l
+    #     11, #q_hip_rotation_l
+    #     12, #q_knee_angle_l
+    #     13, #q_ankle_angle_l
+    #     14, #q_lumbar_extension
+    #     15, #q_lumbar_bending
+    #     16, #q_lumbar_rotation
+    #     17, #dq_pelvis_tx
+    #     18, #dq_pelvis_tz
+    #     19, #dq_pelvis_ty
+    #     20, #dq_pelvis_tilt
+    #     21, #dq_pelvis_list
+    #     22, #dq_pelvis_rotation
+    #     23, #dq_hip_flexion_r
+    #     24, #dq_hip_adduction_r
+    #     25, #dq_hip_rotation_r
+    #     26, #dq_knee_angle_r
+    #     27, #dq_ankle_angle_r
+    #     28, #dq_hip_flexion_l
+    #     29, #dq_hip_adduction_l
+    #     30, #dq_hip_rotation_l
+    #     31, #dq_knee_angle_l
+    #     32, #dq_ankle_angle_l
+    #     33, #dq_lumbar_extension
+    #     34, #dq_lumbar_bending
+    #     35, #dq_lumbar_rotation
+    # ]
+
+    #22
     relevant_indices = [
         0,  # q_pelvis_tx
         1,  # q_pelvis_tz
@@ -84,8 +127,56 @@ def get_right_ankle_substate(state):
         28,  #dq_knee_angle_r
         29,  #dq_ankle_angle_r
     ]
+
+    #16
+    # relevant_indices = [
+    # 0,  # q_pelvis_ty
+    # 1,  # q_pelvis_tilt
+    # 2,  # q_pelvis_list
+    # 4,  # q_hip_flexion_r
+    # 7,  # q_knee_angle_r
+    # 8,  # q_ankle_angle_r
+    # 14, # q_lumbar_extension
+    # 15, # q_lumbar_bending
+    # 19, # dq_pelvis_ty
+    # 20, # dq_pelvis_tilt
+    # 21, # dq_pelvis_list
+    # 23, # dq_hip_flexion_r
+    # 24, # dq_hip_adduction_r
+    # 25, # dq_hip_rotation_r
+    # 26, # dq_knee_angle_r
+    # 27, # dq_ankle_angle_r
+#]
+    #4 states, just knee and ankle angular position and velocities.
+    # relevant_indices = [
+    #     7,
+    #     8,
+    #     26,
+    #     27
+    # ]
+
+    #12 states
+#     relevant_indices = [
+#     4,
+#     7,  # q_knee_angle_r
+#     8,  # q_ankle_angle_r
+#     9,
+#     12,
+#     13,
+#     23,
+#     26,  # dq_knee_angle_r
+#     27,  # dq_ankle_angle_r
+#     28,
+#     31,
+#     32
+# ]
+
     right_ankle_substate = state[relevant_indices]
     return right_ankle_substate
+    #all
+    #return state
+
+
 
 def get_action_substate(action):
     # Indices of right ankle related features in the observation space
@@ -318,16 +409,16 @@ class PPO:
     def __init__(self, state_dim, action_dim, hidden_dim=64, lr=3e-4, gamma=0.99, epsilon=0.2, value_range=0.5):
         self.actor = nn.Sequential(
             nn.Linear(state_dim, hidden_dim),
-            nn.Tanh(),
+            nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
-            nn.Tanh(),
+            nn.ReLU(),
             nn.Linear(hidden_dim, action_dim),
         )
         self.critic = nn.Sequential(
             nn.Linear(state_dim, hidden_dim),
-            nn.Tanh(),
+            nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
-            nn.Tanh(),
+            nn.ReLU(),
             nn.Linear(hidden_dim, 1)
         )
         self.optimizer = optim.Adam(list(self.actor.parameters()) + list(self.critic.parameters()), lr=lr)
@@ -338,9 +429,14 @@ class PPO:
     def get_action(self, state):
         state = torch.FloatTensor(state).unsqueeze(0)
         mean = self.actor(state)
-        dist = Normal(mean, torch.full_like(mean, 0.1))
+        dist = Normal(mean, torch.full_like(mean, 0.03))
         action = dist.sample()
         return action.squeeze().detach().numpy(), dist.log_prob(action).squeeze().detach().numpy()
+    
+    def get_action_test(self, state):
+        state = torch.FloatTensor(state).unsqueeze(0)
+        action = self.actor(state)
+        return action.squeeze().detach().numpy()
 
     def update(self, states, actions, rewards, next_states, dones, old_log_probs):
         states = torch.FloatTensor(states)
@@ -354,13 +450,13 @@ class PPO:
         with torch.no_grad():
             values = self.critic(states)
             next_values = self.critic(next_states)
-            advantages = rewards + self.gamma * next_values * (1 - dones) - values
+            advantages = rewards + self.gamma * next_values - values
             returns = advantages + values
 
         # PPO update
         for _ in range(10):  # Run multiple epochs
             mean = self.actor(states)
-            dist = Normal(mean, torch.full_like(mean, 0.1))
+            dist = Normal(mean, torch.full_like(mean, 0.03))
             new_log_probs = dist.log_prob(actions).sum(dim=1, keepdim=True)
             
             ratio = torch.exp(new_log_probs - old_log_probs)

@@ -11,7 +11,7 @@ env_id = "HumanoidTorque.walk.real"
 mdp = LocoEnv.make(env_id, use_box_feet=True)
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "best_real_agent_141.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
 agent = Agent.load(agent_file_path)
 
 # Load the model
@@ -19,7 +19,7 @@ input_dim =22  # Number of features in the substate
 hidden_dim = 64
 output_dim = 1  # Number of actions
 model = MLP(input_dim, hidden_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "MLP_best_IL.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_36_hidden_128_perfect_88.pth")
 model.load_state_dict(torch.load(model_load_path))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
