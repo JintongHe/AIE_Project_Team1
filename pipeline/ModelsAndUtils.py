@@ -60,8 +60,7 @@ def ankle_training_reward(state, action, next_state):
 #Extract ankle action from action
 def get_right_ankle_substate(state):
     """Extract relevant features for ankle control"""
-    #22
-    #relevant_indices = [
+    # relevant_indices = [
     #     0,  # q_pelvis_tx
     #     1,  # q_pelvis_tz
     #     2,  # q_pelvis_ty
@@ -85,11 +84,23 @@ def get_right_ankle_substate(state):
     #     28,  #dq_knee_angle_r
     #     29,  #dq_ankle_angle_r
     # ]
-    #right_ankle_substate = state[relevant_indices]
-    #return right_ankle_substate
 
-    #36 
-    return state
+    relevant_indices = [
+        4,
+        7,  # q_knee_angle_r
+        8,  # q_ankle_angle_r
+        9,
+        12,
+        13,
+        23,
+        26,  # dq_knee_angle_r
+        27,  # dq_ankle_angle_r
+        28,
+        31,
+        32
+    ]
+    right_ankle_substate = state[relevant_indices]
+    return right_ankle_substate
 
 def get_action_substate(action):
     # Indices of right ankle related features in the observation space
