@@ -393,12 +393,12 @@ def main():
     policy.load_state_dict(best_policy_state)
 
     # Save the best policy to a file
-    model_save_path = "bipedal_walker_ppo_best_model.pth"
+    model_save_path = "test_hardcore.pth"
     torch.save(best_policy_state, model_save_path)
     print(f"Best model saved to {model_save_path} with reward {best_reward:.2f}")
     
     # Create a test environment with rendering
-    test_env = gym.make("BipedalWalker-v3", hardcore=False, render_mode="human")
+    test_env = gym.make("BipedalWalker-v3", hardcore=True, render_mode="human")
     
     # Test the trained policy
     print("\n--- Running test episodes with the best model ---")

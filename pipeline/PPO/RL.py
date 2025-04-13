@@ -442,7 +442,7 @@ def main():
     )
 
     # Save the best policy state
-    torch.save(best_policy_state, 'walk_4_states.pth')
+    torch.save(best_policy_state, 'new_16_states_survival.pth')
     # After training, load the best policy
     policy.load_state_dict(best_policy_state)
 

@@ -40,20 +40,18 @@
         <joint name="hip_adduction_r" damping="5" stiffness="10" type="hinge" pos="0 0 0" axis="       1        0        0" limited="true" range=" -0.524   0.524" ref="0"></joint>
         <joint name="hip_rotation_r" damping="5" stiffness="20" type="hinge" pos="0 0 0" axis="       0        1        0" limited="true" range=" -2.0944   2.0944" ref="0"></joint>
         <body name="tibia_r" pos="-0.00167398 -0.365545        0" quat="1.0 0.0 0.0 0.0">
-          <geom name="tibia_r" type="mesh" mesh="tibia_r" rgba="1 0 0 1"></geom>
-          <geom name="fibula_r" type="mesh" mesh="fibula_r"></geom>
-<!--          <inertial pos="       0 -0.208485        0" mass="4.27289367601238" fullinertia="0.072432 0.00732943 0.073438        0        0        0"></inertial>-->
-          <inertial pos="0 -0.208485 0" mass="1.0" fullinertia="0.02 0.02 0.02 0 0 0"/>
+          <!--<geom name="tibia_r" type="mesh" mesh="tibia_r"></geom>
+          <geom name="fibula_r" type="mesh" mesh="fibula_r"></geom>-->
+          <geom name="Corrected OSL" type="mesh" mesh="corrected OSL" euler="1.57 -3.14 0" rgba="1 0 0 1"></geom>
+          <inertial pos="       0 -0.208485        0" mass="4.27289367601238" fullinertia="0.072432 0.00732943 0.073438        0        0        0"></inertial>
           <joint name="knee_angle_r" type="hinge" pos="0 0 0" axis="       0        0        1" limited="true" range=" -2.0944 0.174533" ref="0"></joint>
           <body name="talus_r" pos="       0 -0.480173        0" quat="1.0 0.0 0.0 0.0">
             <geom name="talus_rv" type="mesh" mesh="talus_rv"></geom>
-<!--            <inertial pos="       0        0        0" mass="0.11524999800438" fullinertia="0.00143714 0.00143714 0.00143714        0        0        0"></inertial>-->
-            <inertial pos="0 0 0" mass="0.05" fullinertia="0.0005 0.0005 0.0005 0 0 0"/>
+            <inertial pos="       0        0        0" mass="0.11524999800438" fullinertia="0.00143714 0.00143714 0.00143714        0        0        0"></inertial>
             <joint name="ankle_angle_r" stiffness="10" damping="1" type="hinge" pos="0 0 0" axis="-0.105014 -0.174022 0.979126" limited="true" range=" -1.5708   1.5708" ref="0"></joint>
             <body name="calcn_r" pos="-0.0544606 -0.0468448 0.00884412" quat="1.0 0.0 0.0 0.0">
               <geom name="r_foot" type="mesh" mesh="foot"></geom>
-<!--              <inertial pos="0.106552 0.0319656        0" mass="1.44062497505475" fullinertia="0.00183186 0.00510303 0.00536472        0        0        0"></inertial>-->
-              <inertial pos="0.106552 0.0319656 0" mass="0.35" fullinertia="0.001 0.001 0.001 0 0 0"/>
+              <inertial pos="0.106552 0.0319656        0" mass="1.44062497505475" fullinertia="0.00183186 0.00510303 0.00536472        0        0        0"></inertial>
               <joint name="subtalar_angle_r" armature="0.01" type="hinge" pos="0 0 0" axis=" 0.78718 0.604747 -0.120949" limited="true" range=" -1.5708   1.5708" ref="0"></joint>
               <body name="toes_r" pos="0.190515 -0.00213104 0.00115076" quat="1.0 0.0 0.0 0.0">
                 <geom name="r_bofoot" type="mesh" mesh="bofoot"></geom>
@@ -71,8 +69,8 @@
         <joint name="hip_adduction_l" damping="5" stiffness="10" type="hinge" pos="0 0 0" axis="      -1        0        0" limited="true" range=" -0.524   0.524" ref="0"></joint>
         <joint name="hip_rotation_l" damping="5" stiffness="20" type="hinge" pos="0 0 0" axis="       0       -1        0" limited="true" range=" -2.0944   2.0944" ref="0"></joint>
         <body name="tibia_l" pos="-0.00167398 -0.365545        0" quat="1.0 0.0 0.0 0.0">
-          <geom name="tibia_l" type="mesh" mesh="tibia_l"></geom>
-          <geom name="fibula_l" type="mesh" mesh="fibula_l"></geom>
+           <geom name="tibia_l" type="mesh" mesh="tibia_l"></geom>
+          <geom name="fibula_l" type="mesh" mesh="fibula_l"></geom> 
           <inertial pos="       0 -0.208485        0" mass="4.27289367601238" fullinertia="0.072432 0.00732943 0.073438        0        0        0"></inertial>
           <joint name="knee_angle_l" type="hinge" pos="0 0 0" axis="       0        0        1" limited="true" range=" -2.0944 0.174533" ref="0"></joint>
           <body name="talus_l" pos="       0 -0.480173        0" quat="1.0 0.0 0.0 0.0">
@@ -81,6 +79,7 @@
             <joint name="ankle_angle_l"  stiffness="10" damping="1" type="hinge" pos="0 0 0" axis="0.105014 0.174022 0.979126" limited="true" range=" -1.0472   1.0472" ref="0"></joint>
             <body name="calcn_l" pos="-0.0544606 -0.0468448 -0.00884412" quat="1.0 0.0 0.0 0.0">
               <geom name="l_foot" type="mesh" mesh="l_foot"></geom>
+              <!-- <geom name = "OSL Foot" type="mesh" mesh="OSL Foot" euler="1.57 -3.14 0" rgba = "1 0 0 1"></geom> -->
               <inertial pos="0.106552 0.0319656        0" mass="1.44062497505475" fullinertia="0.00183186 0.00510303 0.00536472        0        0        0"></inertial>
               <joint name="subtalar_angle_l" armature="0.01" type="hinge" pos="0 0 0" axis="-0.78718 -0.604747 -0.120949" limited="true" range=" -1.5708   1.5708" ref="0"></joint>
               <body name="toes_l" pos="0.190515 -0.00213104 -0.00115076" quat="1.0 0.0 0.0 0.0">
@@ -282,6 +281,12 @@
     <mesh name="metacarpal1_lvs" file="meshes/metacarpal1_lvs.stl" scale="0.905691 0.905691 0.905691"></mesh>
     <mesh name="thumb_proximal_lvs" file="meshes/thumb_proximal_lvs.stl" scale="0.905691 0.905691 0.905691"></mesh>
     <mesh name="thumb_distal_lvs" file="meshes/thumb_distal_lvs.stl" scale="0.905691 0.905691 0.905691"></mesh>
+
+    <mesh name="Simplified OSL (medium)" file="meshes/simplify_OSL v2.0 Assembly (medium).stl" scale="1.5 1.5 1.5"></mesh>
+    <mesh name="corrected OSL" file="meshes/corrected_osl.stl" scale="1 1 1"></mesh>
+    <!-- <mesh name="OSL Foot" file="meshes\osl_foot.stl" scale="1 1 1"></mesh> -->
+    <mesh name="OSL Foot" file="meshes/osl_foot_corrected.stl" scale="1 1 1"></mesh>
+
     <texture builtin="gradient" height="100" rgb1=".4 .5 .6" rgb2="0 0 0" type="skybox" width="100"/>
     <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"></texture>
     <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" width="100" height="100"></texture>
