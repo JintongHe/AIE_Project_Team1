@@ -116,8 +116,9 @@ def main():
     env = LocoEnv.make(env_id, use_box_feet=True)
 
     # Load the expert agent
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_80_prosthesis_inertia.msh")
     agent = Agent.load(agent_file_path)
+    agent.model.to(device)
 
     #Initialize the model
     state_dim = 12  # Number of features in the substate
