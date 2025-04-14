@@ -9,10 +9,52 @@ from loco_mujoco import LocoEnv
 from mushroom_rl.core import Agent
 from ModelsAndUtils import MLP, get_right_ankle_substate
 import os
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.distributions import Normal
 from scipy.signal import find_peaks, butter, filtfilt
 
 sns.set(style="whitegrid")
 
+
+# PPO Policy
+class PolicyNet(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super(PolicyNet, self).__init__()
+        self.fc1 = nn.Linear(state_dim, 128)  # Increased network size
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 32)
+
+        # Mean output for continuous actions
+        self.mean = nn.Linear(32, action_dim)
+        # Log standard deviation network
+        self.logstd = nn.Linear(32, action_dim)
+
+        self.action_dim = action_dim
+
+    def forward(self, x):
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
+        mean = F.tanh(self.mean(x))  # Tanh ensures output in [-1, 1] range
+        std = torch.exp(torch.clamp(self.logstd(x), -9, 0.5))
+        return mean, std
+
+    def get_distribution(self, state):
+        """Get the distribution over actions for a given state"""
+        mean, std = self.forward(state)
+        return Normal(mean, std)
+
+    def sample_action(self, state):
+        """Sample actions from distribution for training"""
+        dist = self.get_distribution(state)
+        action = dist.sample()
+        return action, dist.log_prob(action).sum(dim=-1)
+
+    def get_best_action(self, state):
+        """Deterministic action selection for testing"""
+        mean, _ = self.forward(state)
+        return mean
 
 def apply_lowpass_filter(data, cutoff=0.1, fs=1.0, order=4):
     """
