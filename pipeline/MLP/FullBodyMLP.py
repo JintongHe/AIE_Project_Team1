@@ -28,12 +28,12 @@ def main():
     env_id = "HumanoidTorque.walk.perfect"
     mdp = LocoEnv.make(env_id, use_box_feet=True)
 
-    agent_file_path = os.path.join(os.path.dirname(__file__), "real_180.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
     agent = Agent.load(agent_file_path)
 
     # Initialize the model
     input_dim = 36  # Number of features in the substate
-    output_dim = 13  # Number of actions (scalar prediction)
+    output_dim = 1  # Number of actions (scalar prediction)
     hidden_dim = 128  # Number of hidden units
     model = MLP(input_dim, hidden_dim, output_dim).to(device)
     model.train()
@@ -73,10 +73,10 @@ def main():
                 # Extract current substate and expert action
                 # current_substate = get_right_ankle_substate(state)
                 expert_action = agent.draw_action(state)
-                #target_value = get_action_substate(expert_action)
+                target_value = get_action_substate(expert_action)
 
                 inputs.append(state)
-                targets.append(expert_action)
+                targets.append(target_value)
 
                 # Step environment using the expert action
                 next_state, reward, done, _ = mdp.step(expert_action)

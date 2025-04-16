@@ -63,44 +63,44 @@ def get_right_ankle_substate(state):
     """Extract relevant features for ankle control"""
 
     #36
-    # relevant_indices = [
-    #     0,  # q_pelvis_ty
-    #     1,  # q_pelvis_tilt
-    #     2,  # q_pelvis_list
-    #     3,  #q_pelvis_rotation
-    #     4,  #q_hip_flexion_r
-    #     5,  #q_hip_adduction_r
-    #     6,  #q_hip_rotation_r
-    #     7,  #q_knee_angle_r
-    #     8,  #q_ankle_angle_r
-    #     9,  #q_hip_flexion_l
-    #     10,  #q_hip_adduction_l
-    #     11, #q_hip_rotation_l
-    #     12, #q_knee_angle_l
-    #     13, #q_ankle_angle_l
-    #     14, #q_lumbar_extension
-    #     15, #q_lumbar_bending
-    #     16, #q_lumbar_rotation
-    #     17, #dq_pelvis_tx
-    #     18, #dq_pelvis_tz
-    #     19, #dq_pelvis_ty
-    #     20, #dq_pelvis_tilt
-    #     21, #dq_pelvis_list
-    #     22, #dq_pelvis_rotation
-    #     23, #dq_hip_flexion_r
-    #     24, #dq_hip_adduction_r
-    #     25, #dq_hip_rotation_r
-    #     26, #dq_knee_angle_r
-    #     27, #dq_ankle_angle_r
-    #     28, #dq_hip_flexion_l
-    #     29, #dq_hip_adduction_l
-    #     30, #dq_hip_rotation_l
-    #     31, #dq_knee_angle_l
-    #     32, #dq_ankle_angle_l
-    #     33, #dq_lumbar_extension
-    #     34, #dq_lumbar_bending
-    #     35, #dq_lumbar_rotation
-    # ]
+    relevant_indices = [
+        0,  # q_pelvis_ty
+        1,  # q_pelvis_tilt
+        2,  # q_pelvis_list
+        3,  #q_pelvis_rotation
+        4,  #q_hip_flexion_r
+        5,  #q_hip_adduction_r
+        6,  #q_hip_rotation_r
+        7,  #q_knee_angle_r
+        8,  #q_ankle_angle_r
+        9,  #q_hip_flexion_l
+        10,  #q_hip_adduction_l
+        11, #q_hip_rotation_l
+        12, #q_knee_angle_l
+        13, #q_ankle_angle_l
+        14, #q_lumbar_extension
+        15, #q_lumbar_bending
+        16, #q_lumbar_rotation
+        17, #dq_pelvis_tx
+        18, #dq_pelvis_tz
+        19, #dq_pelvis_ty
+        20, #dq_pelvis_tilt
+        21, #dq_pelvis_list
+        22, #dq_pelvis_rotation
+        23, #dq_hip_flexion_r
+        24, #dq_hip_adduction_r
+        25, #dq_hip_rotation_r
+        26, #dq_knee_angle_r
+        27, #dq_ankle_angle_r
+        28, #dq_hip_flexion_l
+        29, #dq_hip_adduction_l
+        30, #dq_hip_rotation_l
+        31, #dq_knee_angle_l
+        32, #dq_ankle_angle_l
+        33, #dq_lumbar_extension
+        34, #dq_lumbar_bending
+        35, #dq_lumbar_rotation
+    ]
 
     #22
     # relevant_indices = [
@@ -156,20 +156,20 @@ def get_right_ankle_substate(state):
     # ]
 
     #12 states
-    relevant_indices = [
-    4,
-    7,  # q_knee_angle_r
-    8,  # q_ankle_angle_r
-    9,
-    12,
-    13,
-    23,
-    26,  # dq_knee_angle_r
-    27,  # dq_ankle_angle_r
-    28,
-    31,
-    32
-]
+#     relevant_indices = [
+#     4,
+#     7,  # q_knee_angle_r
+#     8,  # q_ankle_angle_r
+#     9,
+#     12,
+#     13,
+#     23,
+#     26,  # dq_knee_angle_r
+#     27,  # dq_ankle_angle_r
+#     28,
+#     31,
+#     32
+# ]
     right_ankle_substate = state[relevant_indices]
     return right_ankle_substate
     #all

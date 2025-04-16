@@ -5,7 +5,8 @@ from loco_mujoco import LocoEnv
 
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_80_prosthesis_inertia.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
+
 agent = Agent.load(agent_file_path)
 
 
