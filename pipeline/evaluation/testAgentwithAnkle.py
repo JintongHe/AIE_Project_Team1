@@ -20,12 +20,12 @@ agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.m
 agent = Agent.load(agent_file_path)
 
 # Load the model
-input_dim = 16  # Number of features in the substate
+input_dim = 22  # Number of features in the substate
 hidden_dim = 128
 output_dim = 1  # Number of actions
 
 model = MLP(input_dim, hidden_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_perfect_88.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_22_hidden_128_perfect_88.pth")
 model.load_state_dict(torch.load(model_load_path, map_location=torch.device('cuda')))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")

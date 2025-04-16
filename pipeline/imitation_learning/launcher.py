@@ -5,7 +5,7 @@ from experiment_launcher.utils import is_local
 if __name__ == '__main__':
     LOCAL = is_local()
     TEST = False
-    USE_CUDA = True
+    USE_CUDA = False
 
     N_SEEDS = 1
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
                         use_timestamp=True,
                         )
 
-    default_params = dict(n_epochs=80,
+    default_params = dict(n_epochs=20,
                           n_steps_per_epoch=100000,
                           n_epochs_save=5,
                           n_eval_episodes=5,
@@ -41,3 +41,4 @@ if __name__ == '__main__':
         launcher.add_experiment(env_id__=env_id, **default_params)
 
     launcher.run(LOCAL, TEST)
+# tensorboard --logdir ./logs

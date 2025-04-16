@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 from experiment_launcher import run_experiment
-from mushroom_rl.core import Core
+from mushroom_rl.core import Core, Agent
 from mushroom_rl.utils.dataset import compute_J, compute_episodes_length
 from mushroom_rl.core.logger.logger import Logger
 
@@ -38,7 +38,8 @@ def experiment(env_id: str = "HumanoidTorque.walk.real",
 
     # create environment, agent and core
     mdp = LocoEnv.make(env_id)
-    agent = get_agent(env_id, mdp, use_cuda, sw)
+    # agent = get_agent(env_id, mdp, use_cuda, sw)
+    agent = Agent.load(r"C:\test\AIE_Project_Team1\pipeline\imitation_learning\logs\loco_mujoco_evalution_2025-04-14_16-08-43\env_id___HumanoidTorque.walk.perfect\0\agent_epoch_78_J_802.067935.msh")
     core = Core(agent, mdp)
 
     for epoch in range(n_epochs):
