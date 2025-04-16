@@ -28,7 +28,7 @@ def main():
     env_id = "HumanoidTorque.walk.perfect"
     mdp = LocoEnv.make(env_id, use_box_feet=True)
 
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesis_inertia.msh")
     agent = Agent.load(agent_file_path)
 
     # Initialize the model

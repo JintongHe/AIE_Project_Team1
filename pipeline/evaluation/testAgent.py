@@ -4,7 +4,7 @@ from mushroom_rl.core import Core, Agent
 from loco_mujoco import LocoEnv
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_100_prosthesis_inertia.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesis_inertia.msh")
 agent = Agent.load(agent_file_path)
 
 # Initialize the humanoid environment
@@ -32,6 +32,7 @@ for episode in range(num_episodes):
         # Update state
         state = next_state
         step += 1
+    print(step)
     total_steps += step
     print(f"Episode {episode + 1} completed")
 

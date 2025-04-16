@@ -39,7 +39,7 @@ def experiment(env_id: str = "HumanoidTorque.walk.real",
     # create environment, agent and core
     mdp = LocoEnv.make(env_id)
     # agent = get_agent(env_id, mdp, use_cuda, sw)
-    agent = Agent.load(r"C:\test\AIE_Project_Team1\pipeline\imitation_learning\logs\loco_mujoco_evalution_2025-04-14_16-08-43\env_id___HumanoidTorque.walk.perfect\0\agent_epoch_78_J_802.067935.msh")
+    agent = Agent.load(r"C:\test\AIE_Project_Team1\pipeline\imitation_learning\logs\loco_mujoco_evalution_2025-04-16_09-39-38\env_id___HumanoidTorque.walk.perfect\0\agent_epoch_5_J_988.457348.msh")
     core = Core(agent, mdp)
 
     for epoch in range(n_epochs):
