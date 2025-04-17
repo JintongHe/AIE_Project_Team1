@@ -11,9 +11,14 @@ import time
 class PolicyNet(nn.Module):
     def __init__(self, state_dim, action_dim):
         super(PolicyNet, self).__init__()
-        self.fc1 = nn.Linear(state_dim, 128)  # Increased network size
+        self.fc1 = nn.Linear(state_dim, 128)
+        self.ln1 = nn.LayerNorm(128)  # Layer normalization after first linear layer
+        
         self.fc2 = nn.Linear(128, 64)
+        self.ln2 = nn.LayerNorm(64)  # Layer normalization after second linear layer
+        
         self.fc3 = nn.Linear(64, 32)
+        self.ln3 = nn.LayerNorm(32)  # Layer normalization after third linear layer
         
         # Mean output for continuous actions
         self.mean = nn.Linear(32, action_dim)
@@ -23,12 +28,22 @@ class PolicyNet(nn.Module):
         self.action_dim = action_dim
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
+        x = self.fc1(x)
+        x = self.ln1(x)  # Apply normalization before activation
+        x = F.relu(x)
+        
+        x = self.fc2(x)
+        x = self.ln2(x)  # Apply normalization before activation
+        x = F.relu(x)
+        
+        x = self.fc3(x)
+        x = self.ln3(x)  # Apply normalization before activation
+        x = F.relu(x)
+        
         mean = F.tanh(self.mean(x))  # Tanh ensures output in [-1, 1] range
         std = torch.exp(torch.clamp(self.logstd(x), -9, 0.5))
         return mean, std
+
     
     def get_distribution(self, state):
         """Get the distribution over actions for a given state"""
@@ -51,12 +66,22 @@ class ValueNet(nn.Module):
     def __init__(self, state_dim):
         super(ValueNet, self).__init__()
         self.fc1 = nn.Linear(state_dim, 128)
+        self.ln1 = nn.LayerNorm(128)  # Layer normalization after first linear layer
+        
         self.fc2 = nn.Linear(128, 64)
+        self.ln2 = nn.LayerNorm(64)  # Layer normalization after second linear layer
+        
         self.fc3 = nn.Linear(64, 1)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        x = self.fc1(x)
+        x = self.ln1(x)  # Apply normalization before activation
+        x = F.relu(x)
+        
+        x = self.fc2(x)
+        x = self.ln2(x)  # Apply normalization before activation
+        x = F.relu(x)
+        
         return self.fc3(x).squeeze(-1)
 
 # PPO Buffer for storing trajectories
