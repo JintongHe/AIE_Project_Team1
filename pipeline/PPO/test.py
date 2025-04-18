@@ -116,7 +116,7 @@ def main():
     env = LocoEnv.make(env_id, use_box_feet=True)
 
     # Load the expert agent
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_100_prosthesis_inertia.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesis_inertia.msh")
     agent = Agent.load(agent_file_path)
     
 
@@ -124,7 +124,7 @@ def main():
     state_dim = 22  # Number of features in the substate
     action_dim = 1  # Number of actions
     policy = PolicyNet(state_dim, action_dim).to(device)
-    policy_load_path = os.path.join(os.path.dirname(__file__), "new_36_states_survivalener_norm_noise_pros.pth")
+    policy_load_path = os.path.join(os.path.dirname(__file__), "new_22_states_survival_pros2.pth")
     policy.load_state_dict(torch.load(policy_load_path))
     policy.eval()
     print(f"Model weights loaded from {policy_load_path}")
