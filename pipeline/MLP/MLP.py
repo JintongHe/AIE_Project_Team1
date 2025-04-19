@@ -32,7 +32,7 @@ def main():
     agent = Agent.load(agent_file_path)
 
     # Initialize the model
-    input_dim = 36  # Number of features in the substate
+    input_dim = 16  # Number of features in the substate
     output_dim = 1  # Number of actions (scalar prediction)
     hidden_dim = 128  # Number of hidden units
     model = MLP(input_dim, hidden_dim, output_dim).to(device)
@@ -54,7 +54,7 @@ def main():
     epochs_no_improve = 0
 
     # Define a path to save the best model
-    model_save_path = os.path.join(os.path.dirname(__file__), "mlp_state_36_hidden_128_perfect_88.pth")
+    model_save_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_prosthesis.pth")
     state = mdp.reset()
     for epoch in range(num_epochs):
         # Reset environment at the beginning of each epoch

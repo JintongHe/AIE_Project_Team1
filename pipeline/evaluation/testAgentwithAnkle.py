@@ -16,16 +16,16 @@ env_id = "HumanoidTorque.walk.perfect"
 mdp = LocoEnv.make(env_id, use_box_feet=True)
 
 # Load the expert agent
-agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
+agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesis_inertia.msh")
 agent = Agent.load(agent_file_path)
 
 # Load the model
-input_dim = 22  # Number of features in the substate
+input_dim = 16  # Number of features in the substate
 hidden_dim = 128
 output_dim = 1  # Number of actions
 
 model = MLP(input_dim, hidden_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_22_hidden_128_perfect_88.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_prosthesis.pth")
 model.load_state_dict(torch.load(model_load_path, map_location=torch.device('cuda')))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
@@ -46,7 +46,7 @@ for episode in range(num_episodes):
             break
 
         # Create the right ankle substate tensor (here we simply use the full state tensor)
-        right_ankle_substate = get_right_ankle_substate(state)
+        right_ankle_substate = get_right_ankle_substate(state, input_dim)
         right_ankle_substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
 
         # Get action from the model

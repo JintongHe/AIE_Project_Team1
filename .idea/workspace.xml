@@ -4,38 +4,34 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c561c074-0481-41b4-8d9d-886111c36a06" name="Changes" comment="Upload prosthesis policy">
+    <list default="true" id="c561c074-0481-41b4-8d9d-886111c36a06" name="Changes" comment="Update msh file">
+      <change afterPath="$PROJECT_DIR$/pipeline/evaluation/new_16_states_survival.pth" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipeline/evaluation/new_16_states_survival_pros2.pth" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipeline/evaluation/new_22_states_survival.pth" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipeline/evaluation/new_22_states_survival_pros3.pth" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipeline/evaluation/new_36_states_survival.pth" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipeline/evaluation/new_36_states_survival_pros.pth" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipeline/evaluation/perfect_140_prosthesis_inertia.msh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pipeline/evaluation/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ls-iq" beforeDir="false" afterPath="$PROJECT_DIR$/ls-iq" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/MLP/MLP.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/MLP/MLP.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/evaluation/ModelsAndUtils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/evaluation/ModelsAndUtils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/imitation_learning/experiment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/agent_epoch_148_J_983.463051.msh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/agent_epoch_180.msh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/agent_epoch_270.msh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/agent_epoch_360.msh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/agent_epoch_423_J_991.255877.msh" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/MLP/perfect_100_prosthesis_inertia.msh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/agent_epoch_495_J_642.787921.msh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/agent_epoch_5_J_17.090281.msh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/agent_epoch_90.msh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739657729.MacBook-Pro-262.local.21185.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739657758.MacBook-Pro-262.local.21291.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739658190.MacBook-Pro-262.local.22873.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739689035.MacBook-Pro-262.70490.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739689069.MacBook-Pro-262.70648.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739689418.MacBook-Pro-262.72122.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739928689.MacBook-Pro-262.local.18477.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739949181.MacBook-Pro-262.40051.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/events.out.tfevents.1739949266.MacBook-Pro-262.40427.0" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/logging/Epoch-0.npy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/logging/J_mean-0.npy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/logging/L-0.npy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/imitation_learning/logs/0/logging/R_mean-0.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/evaluation/mlp_state_12_hidden_128_perfect_88.pth" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/evaluation/mlp_state_12_hidden_256_perfect_88.pth" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/evaluation/mlp_state_16_hidden_128_perfect_88.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/evaluation/testAgentwithAnkle.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/evaluation/testAgentwithAnkle.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -44,7 +40,6 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -67,38 +62,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.Python tests in test.py.executor&quot;: &quot;Run&quot;,
-    &quot;Python.MLP.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ModelsAndUtils.executor&quot;: &quot;Run&quot;,
-    &quot;Python.gait_cycle_analysis.executor&quot;: &quot;Run&quot;,
-    &quot;Python.launcher.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.run-gait-analysis-full.executor&quot;: &quot;Run&quot;,
-    &quot;Python.run-gait-analysis.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.testAgent (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.testAgent.executor&quot;: &quot;Run&quot;,
-    &quot;Python.testAgentwithAnkle (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.testAgentwithAnkle.executor&quot;: &quot;Run&quot;,
-    &quot;Python.testAgentwithAnkle_plot.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Jonathan&quot;,
-    &quot;ignore_missing_gitignore&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/test/AIE_Project_Team1/pipeline/MLP&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.Python tests in test.py.executor": "Run",
+    "Python.MLP.executor": "Run",
+    "Python.launcher.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.test.executor": "Run",
+    "Python.testAgentwithAnkle.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Jonathan",
+    "ignore_missing_gitignore": "true",
+    "last_opened_file_path": "C:/test/AIE_Project_Team1/pipeline/evaluation",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\test\AIE_Project_Team1\pipeline\MLP" />
       <recent name="C:\test\AIE_Project_Team1\pipeline\evaluation" />
       <recent name="C:\test\AIE_Project_Team1\pipeline\imitation_learning" />
     </key>
@@ -108,7 +94,7 @@
       <recent name="C:\test\AIE_Project_Team1" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.launcher">
+  <component name="RunManager" selected="Python.test">
     <configuration name="MLP" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AIE_Project_Team1" />
       <option name="ENV_FILES" value="" />
@@ -124,52 +110,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/MLP/MLP.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="launcher" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AIE_Project_Team1" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline/imitation_learning" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/imitation_learning/launcher.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="launcher" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AIE_Project_Team1" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline/imitation_learning" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/imitation_learning/launcher.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -224,29 +164,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="testAgent" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AIE_Project_Team1" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline/evaluation" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/evaluation/testAgent.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="testAgentwithAnkle" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AIE_Project_Team1" />
       <option name="ENV_FILES" value="" />
@@ -270,68 +187,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="testAgentwithAnkle_plot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AIE_Project_Team1" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline/evaluation" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/evaluation/testAgentwithAnkle_plot.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="testAgentwithAnkle_plot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AIE_Project_Team1" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline/evaluation" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/evaluation/testAgentwithAnkle_plot.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Python tests in test.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
-      <module name="AIE_Project_Team1" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline/evaluation" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/pipeline/evaluation/test.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
-    </configuration>
     <configuration name="Python tests in test.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="AIE_Project_Team1" />
       <option name="ENV_FILES" value="" />
@@ -350,11 +205,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.launcher" />
-        <item itemvalue="Python.testAgent" />
-        <item itemvalue="Python.MLP" />
+        <item itemvalue="Python.test" />
+        <item itemvalue="Python.testAgentwithAnkle" />
         <item itemvalue="Python tests.Python tests in test.py" />
-        <item itemvalue="Python.testAgentwithAnkle_plot" />
+        <item itemvalue="Python.MLP" />
+        <item itemvalue="Python.testAgent" />
       </list>
     </recent_temporary>
   </component>
@@ -377,25 +232,9 @@
       <workItem from="1739471873506" duration="930000" />
       <workItem from="1739479031554" duration="4885000" />
       <workItem from="1739500098741" duration="5495000" />
-      <workItem from="1742774535421" duration="12386000" />
-      <workItem from="1742832164334" duration="2531000" />
-      <workItem from="1742844734297" duration="733000" />
-      <workItem from="1742855531392" duration="12264000" />
-      <workItem from="1742909870231" duration="6000" />
-      <workItem from="1742921875739" duration="3327000" />
-      <workItem from="1742928920047" duration="9638000" />
-      <workItem from="1742940008749" duration="1529000" />
-      <workItem from="1742948302320" duration="6970000" />
-      <workItem from="1743025053996" duration="8488000" />
-      <workItem from="1743259935799" duration="814000" />
-      <workItem from="1743289049066" duration="3078000" />
-      <workItem from="1744560876418" duration="8946000" />
-      <workItem from="1744647499221" duration="335000" />
-      <workItem from="1744661095609" duration="12261000" />
-      <workItem from="1744745652245" duration="3081000" />
-      <workItem from="1744752479106" duration="6413000" />
-      <workItem from="1744821130317" duration="3255000" />
-      <workItem from="1744829577806" duration="1855000" />
+      <workItem from="1744910330218" duration="1348000" />
+      <workItem from="1744913047511" duration="783000" />
+      <workItem from="1745071048826" duration="1703000" />
     </task>
     <task id="LOCAL-00001" summary="Change Dir hierarchy">
       <option name="closed" value="true" />
@@ -429,23 +268,7 @@
       <option name="project" value="LOCAL" />
       <updated>1739482733681</updated>
     </task>
-    <task id="LOCAL-00005" summary="Upload mlp model and training files">
-      <option name="closed" value="true" />
-      <created>1742740375937</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1742740375937</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Upload mlp model and plotting files,">
-      <option name="closed" value="true" />
-      <created>1742941376163</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1742941376167</updated>
-    </task>
-    <option name="localTasksCounter" value="7" />
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -454,29 +277,27 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Change Dir hierarchy" />
     <MESSAGE value="uploaded kickstart file" />
-    <MESSAGE value="Upload mlp model and training files" />
-    <MESSAGE value="Upload mlp model and plotting files," />
-    <option name="LAST_COMMIT_MESSAGE" value="Upload mlp model and plotting files," />
+    <option name="LAST_COMMIT_MESSAGE" value="uploaded kickstart file" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$main.coverage" NAME="main Coverage Results" MODIFIED="1739823131134" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$run_gait_analysis.coverage" NAME="run-gait-analysis Coverage Results" MODIFIED="1743366198659" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$IL__1_.coverage" NAME="IL (1) Coverage Results" MODIFIED="1742160256368" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/GAIL" />
-    <SUITE FILE_PATH="coverage/AIE_Project_Team1$.coverage" NAME=" Coverage Results" MODIFIED="1744640396806" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
+    <SUITE FILE_PATH="coverage/AIE_Project_Team1$.coverage" NAME=" Coverage Results" MODIFIED="1745071888497" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$gait_cycle_analysis.coverage" NAME="gait_cycle_analysis Coverage Results" MODIFIED="1742924765793" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
-    <SUITE FILE_PATH="coverage/AIE_Project_Team1$run_gait_analysis_full.coverage" NAME="run-gait-analysis-full Coverage Results" MODIFIED="1744639820550" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
+    <SUITE FILE_PATH="coverage/AIE_Project_Team1$run_gait_analysis_full.coverage" NAME="run-gait-analysis-full Coverage Results" MODIFIED="1744840586869" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$IL.coverage" NAME="IL Coverage Results" MODIFIED="1742330661391" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/MLP" />
-    <SUITE FILE_PATH="coverage/AIE_Project_Team1$test.coverage" NAME="test Coverage Results" MODIFIED="1744640396482" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
+    <SUITE FILE_PATH="coverage/AIE_Project_Team1$test.coverage" NAME="test Coverage Results" MODIFIED="1745072741735" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgentwithAnkle_36.coverage" NAME="testAgentwithAnkle_36 Coverage Results" MODIFIED="1742738169049" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1744829740087" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/imitation_learning" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgent__1_.coverage" NAME="testAgent (1) Coverage Results" MODIFIED="1742931703425" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
-    <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgentwithAnkle.coverage" NAME="testAgentwithAnkle Coverage Results" MODIFIED="1744640529793" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
+    <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgentwithAnkle.coverage" NAME="testAgentwithAnkle Coverage Results" MODIFIED="1745072125256" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1742336716733" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/MLP" />
-    <SUITE FILE_PATH="coverage/AIE_Project_Team1$MLP.coverage" NAME="MLP Coverage Results" MODIFIED="1744807895228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/MLP" />
+    <SUITE FILE_PATH="coverage/AIE_Project_Team1$MLP.coverage" NAME="MLP Coverage Results" MODIFIED="1744897169126" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/MLP" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgentWithIL.coverage" NAME="testAgentWithIL Coverage Results" MODIFIED="1742169554728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgentwithAnkle_plot.coverage" NAME="testAgentwithAnkle_plot Coverage Results" MODIFIED="1743027754940" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$ModelsAndUtils.coverage" NAME="ModelsAndUtils Coverage Results" MODIFIED="1742826289428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline" />
     <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgentwithAnkle__1_.coverage" NAME="testAgentwithAnkle (1) Coverage Results" MODIFIED="1743032084476" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
-    <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgent.coverage" NAME="testAgent Coverage Results" MODIFIED="1744810675114" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
+    <SUITE FILE_PATH="coverage/AIE_Project_Team1$testAgent.coverage" NAME="testAgent Coverage Results" MODIFIED="1744846246577" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pipeline/evaluation" />
   </component>
 </project>
