@@ -121,10 +121,10 @@ def main():
     
 
     #Initialize the model
-    state_dim = 22  # Number of features in the substate
+    state_dim = 12  # Number of features in the substate
     action_dim = 1  # Number of actions
     policy = PolicyNet(state_dim, action_dim).to(device)
-    policy_load_path = os.path.join(os.path.dirname(__file__), "new_22_states_survival_pros3.pth")
+    policy_load_path = os.path.join(os.path.dirname(__file__), "new_12_states_survival_pros.pth")
     policy.load_state_dict(torch.load(policy_load_path))
     policy.eval()
     print(f"Model weights loaded from {policy_load_path}")
