@@ -411,7 +411,7 @@ def main():
     agent = Agent.load(agent_file_path)
 
     #Initialize the model
-    state_dim = 12  # Number of features in the substate
+    state_dim = 16  # Number of features in the substate
     value_dim = 36
     action_dim = 1  # Number of actions
     hidden_dim = 64  # Number of hidden units
@@ -442,7 +442,7 @@ def main():
     )
 
     # Save the best policy state
-    torch.save(best_policy_state, 'new_12_states_survival_pros.pth')
+    torch.save(best_policy_state, 'new_16_states_survival_pros2.pth')
     # After training, load the best policy
     policy.load_state_dict(best_policy_state)
 
