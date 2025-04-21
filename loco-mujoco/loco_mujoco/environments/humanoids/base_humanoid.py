@@ -34,7 +34,7 @@ class BaseHumanoid(LocoEnv):
                         "humanoid_muscle.xml").as_posix()
         else:
             xml_path = (Path(__file__).resolve().parent.parent / "data" / "humanoid" /
-                        "humanoid_torque_prosthesis.xml").as_posix()
+                        "humanoid_torque.xml").as_posix()
 
         action_spec = self._get_action_specification(use_muscles)
 

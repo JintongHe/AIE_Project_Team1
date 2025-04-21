@@ -9,6 +9,7 @@ import torch.nn.functional as F
 from ModelsAndUtils import MLP, get_right_ankle_substate, get_action_substate
 from torch.distributions import Normal
 import numpy as np
+import keyboard
 import scipy.signal
 
 # Policy Network for continuous actions - adjusted for BipedalWalker
@@ -51,7 +52,7 @@ class PolicyNet(nn.Module):
         return mean
 
 
-def test_best_policy(policy, env, agent, num_episodes=10, max_steps=2000, device="mps", input_dim=36):
+def test_best_policy(policy, env, agent, num_episodes=10, max_steps=10000, device="mps", input_dim=36):
     """
     Test the best policy by running it in the environment multiple times with rendering.
     
@@ -68,6 +69,8 @@ def test_best_policy(policy, env, agent, num_episodes=10, max_steps=2000, device
     """
     policy.eval()  # Set the policy to evaluation mode
     episode_rewards = []
+    episode_steps = []
+    key_pressed = False
 
     for episode in range(num_episodes):
         state = env.reset()
@@ -75,7 +78,6 @@ def test_best_policy(policy, env, agent, num_episodes=10, max_steps=2000, device
         episode_reward = 0
 
         for step in range(max_steps):
-            env.render()  # Render the environment
 
             # Get the best action from the policy
             with torch.no_grad():
@@ -93,14 +95,17 @@ def test_best_policy(policy, env, agent, num_episodes=10, max_steps=2000, device
             state = next_state
             ankle_state = get_right_ankle_substate(state, input_dim)
             episode_reward += reward
-
+            env.render()  # Render the environment
+            if not key_pressed:
+                # keyboard.press_and_release('1')
+                key_pressed = True
             if done:
                 break
         print("step", step)
-
+        episode_steps.append(step)
         episode_rewards.append(episode_reward)
         print(f"Episode {episode + 1}/{num_episodes} - Total Reward: {episode_reward:.2f}")
-
+    print(sum(episode_steps) / len(episode_steps))
     env.close()
     return episode_rewards
 
@@ -116,14 +121,14 @@ def main():
     env = LocoEnv.make(env_id, use_box_feet=True)
 
     # Load the expert agent
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesis_inertia.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
     agent = Agent.load(agent_file_path)
 
     #Initialize the model
     state_dim = 36  # Number of features in the substate
     action_dim = 1  # Number of actions
     policy = PolicyNet(state_dim, action_dim).to(device)
-    policy_load_path = os.path.join(os.path.dirname(__file__), "new_36_states_survival_pros.pth")
+    policy_load_path = os.path.join(os.path.dirname(__file__), "new_36_states_survival.pth")
     policy.load_state_dict(torch.load(policy_load_path))
     policy.eval()
     print(f"Model weights loaded from {policy_load_path}")

@@ -118,7 +118,7 @@ def resample_cycles(cycles, target_length=100):
     return np.array(resampled_cycles)
 
 
-def run_rollout(agent_type, agent, model=None, num_steps=1000, filter_cutoff=0.05):
+def run_rollout(agent_type, agent, model=None, num_steps=1000, filter_cutoff=0.05, num_dim=36):
     """
     Run a rollout using either the expert agent or MLP model.
     """
@@ -138,8 +138,8 @@ def run_rollout(agent_type, agent, model=None, num_steps=1000, filter_cutoff=0.0
             ankle_action = action[7]  # Get right ankle action
         elif agent_type == "mlp":  # MLP
             # Extract substate for prediction
-            # right_ankle_substate = get_right_ankle_substate(state)
-            substate_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+            right_ankle_substate = get_right_ankle_substate(state, num_dim)
+            substate_tensor = torch.tensor(right_ankle_substate, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
             ankle_action = model(substate_tensor).squeeze().item()
 
             # Get full action from expert but replace ankle
@@ -147,7 +147,7 @@ def run_rollout(agent_type, agent, model=None, num_steps=1000, filter_cutoff=0.0
             action[7] = ankle_action
         else:
             # Get the best action from the policy
-            right_ankle_substate = get_right_ankle_substate(state)
+            right_ankle_substate = get_right_ankle_substate(state, num_dim)
             with torch.no_grad():
                 ankle_state_tensor = torch.as_tensor(right_ankle_substate, dtype=torch.float32).to('cpu')
                 ankle_action = model.get_best_action(ankle_state_tensor)[0]
@@ -222,28 +222,28 @@ def plot_normalized_cycles(expert_cycles, mlp_cycles, rl_cycles, cycle_type="kin
                      alpha=0.3, color='black')
 
     # Plot MLP agent with shaded std
-    plt.plot(cycle_percent, mlp_mean, 'b--', linewidth=2, label='MLP Agent Mean')
+    plt.plot(cycle_percent, mlp_mean, 'b-', linewidth=2, label='MLP Agent Mean')
     plt.fill_between(cycle_percent,
                      mlp_mean - mlp_std,
                      mlp_mean + mlp_std,
                      alpha=0.3, color='blue')
 
     # Plot RL agent with shaded std
-    plt.plot(cycle_percent, rl_mean, 'g--', linewidth=2, label='RL Agent Mean')
+    plt.plot(cycle_percent, rl_mean, 'g-', linewidth=2, label='RL Agent Mean')
     plt.fill_between(cycle_percent,
                      rl_mean - rl_std,
                      rl_mean + rl_std,
                      alpha=0.3, color='green')
 
     # Plot MLP error with shaded std
-    plt.plot(cycle_percent, mlp_error_mean, 'r--', linewidth=2, label='MLP Error Mean')
+    plt.plot(cycle_percent, mlp_error_mean, 'r-', linewidth=2, label='MLP Error Mean')
     plt.fill_between(cycle_percent,
                      mlp_error_mean - mlp_error_std,
                      mlp_error_mean + mlp_error_std,
                      alpha=0.3, color='red')
 
     # Plot RL error with shaded std
-    plt.plot(cycle_percent, rl_error_mean, 'm--', linewidth=2, label='RL Agent Mean')
+    plt.plot(cycle_percent, rl_error_mean, 'm-', linewidth=2, label='RL Agent Mean')
     plt.fill_between(cycle_percent,
                      rl_error_mean - rl_error_std,
                      rl_error_mean + rl_error_std,
@@ -256,7 +256,7 @@ def plot_normalized_cycles(expert_cycles, mlp_cycles, rl_cycles, cycle_type="kin
               f'MLP MAE: {np.mean(mlp_error_mean):.2f}, RL MAE: {np.mean(rl_error_mean):.2f}',
               fontsize=16)
     plt.grid(True)
-    plt.legend(fontsize=12)
+    # plt.legend(fontsize=12)
 
     # Plot individual cycles
     plt.figure(figsize=(15, 10))
@@ -283,35 +283,49 @@ def plot_normalized_cycles(expert_cycles, mlp_cycles, rl_cycles, cycle_type="kin
 def main():
     # Initialize parameters
     filter_cutoff = 0.05
-    num_cycles = 5
+    num_cycles = 3
     num_steps = 1000
+    num_dim = 16
 
     # Load expert agent
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
+    # perfect_88_original.msh
+    # perfect_140_prosthesis_inertia.msh
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesis_inertia.msh")
     agent = Agent.load(agent_file_path)
 
     # Load MLP model
-    model = MLP(36, 128, 1)
-    model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_36_hidden_128_prosthesis.pth")
+    model = MLP(num_dim, 128, 1)
+    # mlp_state_36_hidden_128_perfect_88.pth
+    # mlp_state_36_hidden_128_prosthesis.pth
+    # mlp_state_22_hidden_128_perfect_88.pth
+    # mlp_state_22_hidden_128_prosthesis.pth
+    # mlp_state_16_hidden_128_prosthesis.pth
+    model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_prosthesis.pth")
     model.load_state_dict(torch.load(model_load_path, map_location=torch.device('cpu')))
     model.eval()
 
     # Load RL model
-    rl_model = PolicyNet(36, 1)
-    rl_model_load_path = os.path.join(os.path.dirname(__file__), "new_36_states_survival.pth")
+    rl_model = PolicyNet(num_dim, 1)
+    # new_36_states_survival.pth
+    # new_36_states_survival_pros.pth
+    # new_22_states_survival.pth
+    # new_22_states_survival_pros3.pth
+    # new_16_states_survival.pth
+    # new_16_states_survival_pros2.pth
+    rl_model_load_path = os.path.join(os.path.dirname(__file__), "new_16_states_survival_pros2.pth")
     rl_model.load_state_dict(torch.load(rl_model_load_path, map_location=torch.device('cpu')))
     rl_model.eval()
 
     print("Running RL agent rollout...")
     rl_smooth_action, rl_raw_action, rl_smooth_angle, rl_raw_angle, rl_time = run_rollout(
-        "rl", agent, rl_model, filter_cutoff=filter_cutoff)
+        "rl", agent, rl_model, filter_cutoff=filter_cutoff, num_dim=num_dim, num_steps=num_steps)
     print("Running expert agent rollout...")
     expert_smooth_action, expert_raw_action, expert_smooth_angle, expert_raw_angle, expert_time = run_rollout(
-        "expert", agent, filter_cutoff=filter_cutoff)
+        "expert", agent, filter_cutoff=filter_cutoff, num_dim=num_dim, num_steps=num_steps)
 
     print("Running MLP agent rollout...")
     mlp_smooth_action, mlp_raw_action, mlp_smooth_angle, mlp_raw_angle, mlp_time = run_rollout(
-        "mlp", agent, model, filter_cutoff=filter_cutoff)
+        "mlp", agent, model, filter_cutoff=filter_cutoff, num_dim=num_dim, num_steps=num_steps)
 
     # print("Running RL agent rollout...")
     # rl_smooth_action, rl_raw_action, rl_smooth_angle, rl_raw_angle, rl_time = run_rollout(

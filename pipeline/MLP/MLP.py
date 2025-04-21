@@ -28,7 +28,7 @@ def main():
     env_id = "HumanoidTorque.walk.perfect"
     mdp = LocoEnv.make(env_id, use_box_feet=True)
 
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesis_inertia.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
     agent = Agent.load(agent_file_path)
 
     # Initialize the model
@@ -54,7 +54,7 @@ def main():
     epochs_no_improve = 0
 
     # Define a path to save the best model
-    model_save_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_prosthesis.pth")
+    model_save_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_perfect_88.pth")
     state = mdp.reset()
     for epoch in range(num_epochs):
         # Reset environment at the beginning of each epoch
@@ -71,7 +71,7 @@ def main():
                     print('expert falls')
                     state = mdp.reset()
                 # Extract current substate and expert action
-                current_substate = get_right_ankle_substate(state)
+                current_substate = get_right_ankle_substate(state, input_dim)
                 expert_action = agent.draw_action(state)
                 target_value = get_action_substate(expert_action)
 

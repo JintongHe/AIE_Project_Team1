@@ -20,19 +20,20 @@ agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesi
 agent = Agent.load(agent_file_path)
 
 # Load the model
-input_dim = 22  # Number of features in the substate
+input_dim = 16  # Number of features in the substate
 hidden_dim = 128
 output_dim = 1  # Number of actions
 
 model = MLP(input_dim, hidden_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_22_hidden_128_prosthesis.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_prosthesis.pth")
 model.load_state_dict(torch.load(model_load_path, map_location=torch.device('cuda')))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
 
 # Perform rollouts
-num_episodes = 10
+num_episodes = 5
 total_steps = 0
+key_pressed = False
 for episode in range(num_episodes):
     state = mdp.reset()
     done = False
@@ -62,11 +63,16 @@ for episode in range(num_episodes):
 
         # Take the action in the environment
         next_state, reward, done, _ = mdp.step(action)
-        mdp.render()
+        # mdp.render()
 
+        if not key_pressed:
+            # keyboard.press_and_release('1')
+            key_pressed = True
         # Update the state and step count
         state = next_state
         step += 1
+        if step > 10000:
+            break
     total_steps += step
     print(f"Episode {episode + 1} completed with {step} steps")
 
