@@ -12,13 +12,10 @@ class PolicyNet(nn.Module):
     def __init__(self, state_dim, action_dim):
         super(PolicyNet, self).__init__()
         self.fc1 = nn.Linear(state_dim, 128)
-        self.ln1 = nn.LayerNorm(128)  # Layer normalization after first linear layer
         
         self.fc2 = nn.Linear(128, 64)
-        self.ln2 = nn.LayerNorm(64)  # Layer normalization after second linear layer
         
         self.fc3 = nn.Linear(64, 32)
-        self.ln3 = nn.LayerNorm(32)  # Layer normalization after third linear layer
         
         # Mean output for continuous actions
         self.mean = nn.Linear(32, action_dim)
@@ -29,15 +26,12 @@ class PolicyNet(nn.Module):
 
     def forward(self, x):
         x = self.fc1(x)
-        x = self.ln1(x)  # Apply normalization before activation
         x = F.relu(x)
         
         x = self.fc2(x)
-        x = self.ln2(x)  # Apply normalization before activation
         x = F.relu(x)
         
         x = self.fc3(x)
-        x = self.ln3(x)  # Apply normalization before activation
         x = F.relu(x)
         
         mean = F.tanh(self.mean(x))  # Tanh ensures output in [-1, 1] range
@@ -378,6 +372,7 @@ def test_policy(policy, env, num_episodes=5, device="mps"):
 
 # Main function
 def main():
+    print(f"Torch version: {torch.__version__}")
     # Initialize the environment
     env = gym.make("BipedalWalker-v3", hardcore=False)
     
@@ -393,6 +388,7 @@ def main():
     device = torch.device( 
                      "cuda" if torch.cuda.is_available() else 
                      "cpu") 
+    #device = "mps" if torch.backends.mps.is_available() else device
     
     # Train using PPO
     best_policy_state, best_reward = ppo_train(

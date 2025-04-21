@@ -7,12 +7,15 @@ import numpy as np
 import scipy.signal
 import time
 
-# Policy Network for continuous actions - adjusted for Pendulum
+# Policy Network for continuous actions - adjusted for BipedalWalker
 class PolicyNet(nn.Module):
     def __init__(self, state_dim, action_dim):
         super(PolicyNet, self).__init__()
-        self.fc1 = nn.Linear(state_dim, 64)  # Reduced network size for simpler problem
-        self.fc2 = nn.Linear(64, 32)
+        self.fc1 = nn.Linear(state_dim, 128)
+        
+        self.fc2 = nn.Linear(128, 64)
+        
+        self.fc3 = nn.Linear(64, 32)
         
         # Mean output for continuous actions
         self.mean = nn.Linear(32, action_dim)
@@ -22,11 +25,19 @@ class PolicyNet(nn.Module):
         self.action_dim = action_dim
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        mean = 2.0 * F.tanh(self.mean(x))  # Scale to [-2, 2] for Pendulum's torque range
+        x = self.fc1(x)
+        x = F.relu(x)
+        
+        x = self.fc2(x)
+        x = F.relu(x)
+        
+        x = self.fc3(x)
+        x = F.relu(x)
+        
+        mean = F.tanh(self.mean(x))  # Tanh ensures output in [-1, 1] range
         std = torch.exp(torch.clamp(self.logstd(x), -9, 0.5))
         return mean, std
+
     
     def get_distribution(self, state):
         """Get the distribution over actions for a given state"""
@@ -48,13 +59,23 @@ class PolicyNet(nn.Module):
 class ValueNet(nn.Module):
     def __init__(self, state_dim):
         super(ValueNet, self).__init__()
-        self.fc1 = nn.Linear(state_dim, 64)
-        self.fc2 = nn.Linear(64, 32)
-        self.fc3 = nn.Linear(32, 1)
+        self.fc1 = nn.Linear(state_dim, 128)
+        self.ln1 = nn.LayerNorm(128)  # Layer normalization after first linear layer
+        
+        self.fc2 = nn.Linear(128, 64)
+        self.ln2 = nn.LayerNorm(64)  # Layer normalization after second linear layer
+        
+        self.fc3 = nn.Linear(64, 1)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        x = self.fc1(x)
+        x = self.ln1(x)  # Apply normalization before activation
+        x = F.relu(x)
+        
+        x = self.fc2(x)
+        x = self.ln2(x)  # Apply normalization before activation
+        x = F.relu(x)
+        
         return self.fc3(x).squeeze(-1)
 
 # PPO Buffer for storing trajectories
@@ -76,6 +97,13 @@ class PPOBuffer:
     def store(self, state, action, reward, value, log_prob, done):
         """Store one transition in the buffer"""
         assert self.ptr < self.max_size
+        
+        # Convert tensors to CPU before storing in NumPy arrays
+        if isinstance(state, torch.Tensor):
+            state = state.cpu().numpy()
+        if isinstance(action, torch.Tensor):
+            action = action.cpu().numpy()
+            
         self.states[self.ptr] = state
         self.actions[self.ptr] = action
         self.rewards[self.ptr] = reward
@@ -135,6 +163,7 @@ class PPOBuffer:
         )
         return {k: torch.as_tensor(v, dtype=torch.float32) for k, v in batch.items()}
 
+
 # Compute KL divergence between old and new policy distributions
 def compute_kl(policy, states, old_mean, old_std):
     new_mean, new_std = policy.forward(states)
@@ -143,13 +172,13 @@ def compute_kl(policy, states, old_mean, old_std):
     kl = torch.distributions.kl_divergence(old_dist, new_dist).sum(dim=-1).mean().item()
     return kl
 
-# PPO main training function - adjusted for Pendulum
-def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=2000,
+# PPO main training function - adjusted for BipedalWalker
+def ppo_train(policy, value_function, env, num_epochs=200, steps_per_epoch=4000,
               gamma=0.99, lam=0.95, clip_ratio=0.2, pi_lr=3e-4, vf_lr=1e-3,
-              train_pi_iters=40, train_v_iters=40, target_kl=0.01, max_ep_len=200,
+              train_pi_iters=80, train_v_iters=80, target_kl=0.01, max_ep_len=2000,
               batch_size=64, device="cpu"):
     """
-    PPO-Clip algorithm implementation for Pendulum with mini-batch updates
+    PPO-Clip algorithm implementation for BipedalWalker with mini-batch updates
     """
     # Set up optimizers
     policy_optimizer = torch.optim.Adam(policy.parameters(), lr=pi_lr, eps=1e-5)
@@ -158,6 +187,10 @@ def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=2000,
     # Set device
     policy.to(device)
     value_function.to(device)
+
+    # Create a copy of the policy to represent the policy from the previous epoch
+    prev_epoch_policy = PolicyNet(env.observation_space.shape[0], env.action_space.shape[0]).to(device)
+    prev_epoch_policy.load_state_dict(policy.state_dict())
     
     # Setup state/action dimensions
     state_dim = env.observation_space.shape[0]
@@ -243,7 +276,10 @@ def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=2000,
                 states = batch['states'].to(device)
                 actions = batch['actions'].to(device)
                 advantages = batch['advantages'].to(device)
-                old_log_probs = batch['log_probs'].to(device)
+                # Compute old log probabilities using prev_epoch_policy
+                with torch.no_grad():
+                    old_dist = prev_epoch_policy.get_distribution(states)
+                    old_log_probs = old_dist.log_prob(actions).sum(dim=-1)
                 
                 policy_optimizer.zero_grad()
                 
@@ -259,15 +295,15 @@ def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=2000,
                 policy_loss = -torch.min(ratio * advantages, clip_adv).mean()
                 
                 # Add entropy bonus for exploration
-                entropy_loss = -0.01 * dist.entropy().sum(dim=-1).mean()
-                total_policy_loss = policy_loss + entropy_loss
+                # entropy_loss = -0.01 * dist.entropy().sum(dim=-1).mean()
+                # total_policy_loss = policy_loss + entropy_loss
                 
                 # Update policy
-                total_policy_loss.backward()
+                policy_loss.backward()
                 policy_optimizer.step()
                 
-                # Check KL divergence to ensure we don't update too much
-                if (i+1) % 10 == 0:
+                # Check KL divergence every 20 iterations to save computation
+                if (i+1) % 20 == 0:
                     kl = compute_kl(policy, all_states, old_mean, old_std)
                     if kl > 1.5 * target_kl:
                         print(f"Early stopping at step {i+1} due to reaching max KL {kl:.3f}")
@@ -299,11 +335,13 @@ def ppo_train(policy, value_function, env, num_epochs=100, steps_per_epoch=2000,
                 if mean_reward > best_reward:
                     best_reward = mean_reward
                     best_policy_state = policy.state_dict().copy()
+            prev_epoch_policy.load_state_dict(policy.state_dict())
     
     return best_policy_state, best_reward
 
+
 # Test the trained policy
-def test_policy(policy, env, num_episodes=5, device="cpu"):
+def test_policy(policy, env, num_episodes=5, device="mps"):
     policy.eval()
     test_rewards = []
     
@@ -334,37 +372,41 @@ def test_policy(policy, env, num_episodes=5, device="cpu"):
 
 # Main function
 def main():
+    print(f"Torch version: {torch.__version__}")
     # Initialize the environment
     env = gym.make("Pendulum-v1")
     
     # Define the state and action dimensions
-    state_dim = env.observation_space.shape[0]  # 3 for Pendulum: [cos(θ), sin(θ), angular velocity]
-    action_dim = env.action_space.shape[0]      # 1 for Pendulum: [torque]
+    state_dim = env.observation_space.shape[0]  # 24 for BipedalWalker
+    action_dim = env.action_space.shape[0]      # 4 for BipedalWalker
     
     # Initialize the policy and value networks
     policy = PolicyNet(state_dim, action_dim)
     value_function = ValueNet(state_dim)
     
     # Set the device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device( 
+                     "cuda" if torch.cuda.is_available() else 
+                     "cpu") 
+    #device = "mps" if torch.backends.mps.is_available() else device
     
     # Train using PPO
     best_policy_state, best_reward = ppo_train(
         policy=policy,
         value_function=value_function,
         env=env,
-        num_epochs=1000,           # Reduced for simpler Pendulum task
-        steps_per_epoch=2000,     # Reduced for Pendulum
+        num_epochs=1000,           # Increased for BipedalWalker
+        steps_per_epoch=4000,     # Steps per epoch
         gamma=0.99,               # Discount factor
         lam=0.95,                 # GAE-Lambda parameter
-        clip_ratio=0.2,           # PPO clip ratio
+        clip_ratio=0.05,           # PPO clip ratio
         pi_lr=3e-4,               # Policy learning rate
         vf_lr=1e-3,               # Value function learning rate
-        train_pi_iters=40,        # Policy optimization iterations
-        train_v_iters=40,         # Value function iterations
-        target_kl=0.01,           # Target KL divergence for early stopping
-        max_ep_len=200,           # Maximum episode length for Pendulum
-        batch_size=64,            # Batch size
+        train_pi_iters=80,        # Policy optimization iterations
+        train_v_iters=80,         # Value function iterations
+        target_kl=0.1,           # Target KL divergence for early stopping
+        max_ep_len=2000,  
+        batch_size=64,        # Maximum episode length for BipedalWalker
         device=device
     )
     
@@ -372,12 +414,12 @@ def main():
     policy.load_state_dict(best_policy_state)
 
     # Save the best policy to a file
-    model_save_path = "pendulum_ppo_best_model.pth"
+    model_save_path = "test_hardcore.pth"
     torch.save(best_policy_state, model_save_path)
     print(f"Best model saved to {model_save_path} with reward {best_reward:.2f}")
     
     # Create a test environment with rendering
-    test_env = gym.make("Pendulum-v1", render_mode="human")
+    test_env = gym.make("BipedalWalker-v3", hardcore=True, render_mode="human")
     
     # Test the trained policy
     print("\n--- Running test episodes with the best model ---")
