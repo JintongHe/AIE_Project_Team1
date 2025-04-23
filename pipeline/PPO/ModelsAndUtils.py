@@ -129,24 +129,24 @@ def get_right_ankle_substate(state):
     # ]
 
     #16
-#     relevant_indices = [
-#     0,  # q_pelvis_ty
-#     1,  # q_pelvis_tilt
-#     2,  # q_pelvis_list
-#     4,  # q_hip_flexion_r
-#     7,  # q_knee_angle_r
-#     8,  # q_ankle_angle_r
-#     14, # q_lumbar_extension
-#     15, # q_lumbar_bending
-#     19, # dq_pelvis_ty
-#     20, # dq_pelvis_tilt
-#     21, # dq_pelvis_list
-#     23, # dq_hip_flexion_r
-#     24, # dq_hip_adduction_r
-#     25, # dq_hip_rotation_r
-#     26, # dq_knee_angle_r
-#     27, # dq_ankle_angle_r
-# ]
+    relevant_indices = [
+    0,  # q_pelvis_ty
+    1,  # q_pelvis_tilt
+    2,  # q_pelvis_list
+    4,  # q_hip_flexion_r
+    7,  # q_knee_angle_r
+    8,  # q_ankle_angle_r
+    14, # q_lumbar_extension
+    15, # q_lumbar_bending
+    19, # dq_pelvis_ty
+    20, # dq_pelvis_tilt
+    21, # dq_pelvis_list
+    23, # dq_hip_flexion_r
+    24, # dq_hip_adduction_r
+    25, # dq_hip_rotation_r
+    26, # dq_knee_angle_r
+    27, # dq_ankle_angle_r
+]
     #4 states, just knee and ankle angular position and velocities.
     # relevant_indices = [
     #     7,
@@ -156,20 +156,20 @@ def get_right_ankle_substate(state):
     # ]
 
     #12 states
-    relevant_indices = [
-    4,
-    7,  # q_knee_angle_r
-    8,  # q_ankle_angle_r
-    9,
-    12,
-    13,
-    23,
-    26,  # dq_knee_angle_r
-    27,  # dq_ankle_angle_r
-    28,
-    31,
-    32
-]
+#     relevant_indices = [
+#     4,
+#     7,  # q_knee_angle_r
+#     8,  # q_ankle_angle_r
+#     9,
+#     12,
+#     13,
+#     23,
+#     26,  # dq_knee_angle_r
+#     27,  # dq_ankle_angle_r
+#     28,
+#     31,
+#     32
+# ]
     right_ankle_substate = state[relevant_indices]
     return right_ankle_substate
     #all
@@ -511,6 +511,9 @@ class MLP(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
+    def get_best_action(self, x):
+        with torch.no_grad():
+            return self.forward(x)
     
 
 class PPO:
