@@ -13,6 +13,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Normal
 from scipy.signal import find_peaks, butter, filtfilt
+import keyboard  # Added for key press detection
 
 sns.set(style="whitegrid")
 
@@ -117,12 +118,13 @@ def resample_cycles(cycles, target_length=100):
 
     return np.array(resampled_cycles)
 
-
+mdp = LocoEnv.make("HumanoidTorque.walk.perfect", use_box_feet=True)
+key_pressed = False
 def run_rollout(agent_type, agent, model=None, num_steps=1000, filter_cutoff=0.05, num_dim=36):
+    global key_pressed
     """
     Run a rollout using either the expert agent or MLP model.
     """
-    mdp = LocoEnv.make("HumanoidTorque.walk.perfect", use_box_feet=True)
     state = mdp.reset()
     done = False
 
@@ -154,6 +156,10 @@ def run_rollout(agent_type, agent, model=None, num_steps=1000, filter_cutoff=0.0
             # Get full action from expert but replace ankle
             action = agent.draw_action(state)
             action[7] = ankle_action
+        mdp.render()
+        if not key_pressed:
+            keyboard.press_and_release('1')
+            key_pressed = True
 
         # Record actions and time steps
         actions.append(ankle_action * 500)  # Scale to Nm
@@ -284,8 +290,8 @@ def main():
     # Initialize parameters
     filter_cutoff = 0.05
     num_cycles = 3
-    num_steps = 1000
-    num_dim = 16
+    num_steps = 3000
+    num_dim = 36
 
     # Load expert agent
     # perfect_88_original.msh
@@ -300,7 +306,7 @@ def main():
     # mlp_state_22_hidden_128_perfect_88.pth
     # mlp_state_22_hidden_128_prosthesis.pth
     # mlp_state_16_hidden_128_prosthesis.pth
-    model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_prosthesis.pth")
+    model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_36_hidden_128_prosthesis.pth")
     model.load_state_dict(torch.load(model_load_path, map_location=torch.device('cpu')))
     model.eval()
 
@@ -312,7 +318,7 @@ def main():
     # new_22_states_survival_pros3.pth
     # new_16_states_survival.pth
     # new_16_states_survival_pros2.pth
-    rl_model_load_path = os.path.join(os.path.dirname(__file__), "new_16_states_survival_pros2.pth")
+    rl_model_load_path = os.path.join(os.path.dirname(__file__), "new_36_states_survival_pros.pth")
     rl_model.load_state_dict(torch.load(rl_model_load_path, map_location=torch.device('cpu')))
     rl_model.eval()
 

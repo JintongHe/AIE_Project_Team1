@@ -20,12 +20,12 @@ agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesi
 agent = Agent.load(agent_file_path)
 
 # Load the model
-input_dim = 16  # Number of features in the substate
+input_dim = 36  # Number of features in the substate
 hidden_dim = 128
 output_dim = 1  # Number of actions
 
 model = MLP(input_dim, hidden_dim, output_dim)
-model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_16_hidden_128_prosthesis.pth")
+model_load_path = os.path.join(os.path.dirname(__file__), "mlp_state_36_hidden_128_prosthesis.pth")
 model.load_state_dict(torch.load(model_load_path, map_location=torch.device('cuda')))
 model.eval()
 print(f"Model weights loaded from {model_load_path}")
@@ -63,7 +63,7 @@ for episode in range(num_episodes):
 
         # Take the action in the environment
         next_state, reward, done, _ = mdp.step(action)
-        # mdp.render()
+        mdp.render()
 
         if not key_pressed:
             # keyboard.press_and_release('1')

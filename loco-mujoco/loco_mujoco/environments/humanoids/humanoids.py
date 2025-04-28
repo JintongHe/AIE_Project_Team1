@@ -25,7 +25,7 @@ class HumanoidTorque(BaseHumanoid):
 
     Observation Space
     -----------------
-
+9
     The observation space has the following properties *by default* (i.e., only obs with Disabled == False):
 
     | For walking and running task: :code:`(min=-inf, max=inf, dim=36, dtype=float32)`
