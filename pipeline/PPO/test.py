@@ -51,7 +51,7 @@ class PolicyNet(nn.Module):
         return mean
 
 
-def test_best_policy(policy, env, agent, num_episodes=10, max_steps=2000, device="mps"):
+def test_best_policy(policy, env, agent, num_episodes=10000000, max_steps=2000, device="mps"):
     """
     Test the best policy by running it in the environment multiple times with rendering.
     
@@ -68,6 +68,7 @@ def test_best_policy(policy, env, agent, num_episodes=10, max_steps=2000, device
     """
     policy.eval()  # Set the policy to evaluation mode
     episode_rewards = []
+    episode = 0
 
     for episode in range(num_episodes):
         state = env.reset()
@@ -116,22 +117,22 @@ def main():
     env = LocoEnv.make(env_id, use_box_feet=True)
 
     # Load the expert agent
-    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_88_original.msh")
+    agent_file_path = os.path.join(os.path.dirname(__file__), "perfect_140_prosthesis_inertia.msh")
     agent = Agent.load(agent_file_path)
     
 
     #Initialize the model
-    state_dim = 16  # Number of features in the substate
+    state_dim = 12  # Number of features in the substate
     action_dim = 1  # Number of actions
     policy = PolicyNet(state_dim, action_dim).to(device)
-    policy_load_path = os.path.join(os.path.dirname(__file__), "new_16_states_survival.pth")
+    policy_load_path = os.path.join(os.path.dirname(__file__), "new_12_states_survival_pros.pth")
     policy.load_state_dict(torch.load(policy_load_path))
     policy.eval()
     print(f"Model weights loaded from {policy_load_path}")
     # After training, load the best policy
     # Run the test function
     print("\nTesting the best policy:")
-    test_rewards = test_best_policy(policy, env, agent, num_episodes=10, device=device)
+    test_rewards = test_best_policy(policy, env, agent, num_episodes=10000000, device=device)
 
     # Print summary statistics
     print(f"\nTest Results:")
